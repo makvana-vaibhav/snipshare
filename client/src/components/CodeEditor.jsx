@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useCallback, useMemo } from 'react';
 import Editor from 'react-simple-code-editor';
 import Prism from 'prismjs';
 import 'prismjs/components/prism-markup';
@@ -25,49 +25,15 @@ import 'prismjs/components/prism-markdown';
 import './CodeEditor.css';
 
 const LANG_MAP = {
-    plaintext: 'none',
-    html: 'markup',
-    javascript: 'javascript',
-    typescript: 'typescript',
-    python: 'python',
-    java: 'java',
-    c: 'c',
-    cpp: 'cpp',
-    csharp: 'csharp',
-    go: 'go',
-    rust: 'rust',
-    ruby: 'ruby',
-    php: 'php',
-    swift: 'swift',
-    kotlin: 'kotlin',
-    css: 'css',
-    json: 'json',
-    yaml: 'yaml',
-    sql: 'sql',
-    bash: 'bash',
-    markdown: 'markdown',
+    plaintext: 'none', html: 'markup', javascript: 'javascript',
+    typescript: 'typescript', python: 'python', java: 'java',
+    c: 'c', cpp: 'cpp', csharp: 'csharp', go: 'go', rust: 'rust',
+    ruby: 'ruby', php: 'php', swift: 'swift', kotlin: 'kotlin',
+    css: 'css', json: 'json', yaml: 'yaml', sql: 'sql',
+    bash: 'bash', markdown: 'markdown',
 };
 
 export default function CodeEditor({ value, onChange, language = 'plaintext', readonly = false }) {
-    const lineNumbersRef = useRef(null);
-    const scrollerRef = useRef(null);
-
-    // Sync line numbers scroll when the editor scrolls
-    useEffect(() => {
-        const scroller = scrollerRef.current;
-        if (!scroller) return;
-
-        const onScroll = () => {
-            if (lineNumbersRef.current) {
-                lineNumbersRef.current.scrollTop = scroller.scrollTop;
-            }
-        };
-
-        // The editor's inner scrollable div is the one we injected via ref
-        scroller.addEventListener('scroll', onScroll, { passive: true });
-        return () => scroller.removeEventListener('scroll', onScroll);
-    }, []);
-
     const prismLang = useMemo(() => LANG_MAP[language] || 'none', [language]);
 
     const escapeHtml = (code) =>
@@ -75,9 +41,7 @@ export default function CodeEditor({ value, onChange, language = 'plaintext', re
 
     const highlight = useCallback((code) => {
         try {
-            if (prismLang === 'none' || !Prism.languages[prismLang]) {
-                return escapeHtml(code);
-            }
+            if (prismLang === 'none' || !Prism.languages[prismLang]) return escapeHtml(code);
             return Prism.highlight(code, Prism.languages[prismLang], prismLang);
         } catch {
             return escapeHtml(code);
@@ -92,14 +56,16 @@ export default function CodeEditor({ value, onChange, language = 'plaintext', re
     const lineCount = (value || '').split('\n').length;
 
     return (
-        <div className="code-editor">
-            <div className="editor-gutter" ref={lineNumbersRef} aria-hidden="true">
+        <div className="code-editor-wrap">
+            {/* Gutter */}
+            <div className="ce-gutter" aria-hidden="true">
                 {Array.from({ length: lineCount }, (_, i) => (
-                    <div key={i + 1} className="editor-line-number">{i + 1}</div>
+                    <div key={i} className="ce-line-no">{i + 1}</div>
                 ))}
             </div>
-            {/* This outer div becomes the scroll container */}
-            <div className="editor-scroll-area" ref={scrollerRef}>
+
+            {/* Editor — react-simple-code-editor is the scroll container */}
+            <div className="ce-body">
                 <Editor
                     value={value}
                     onValueChange={handleInput}
@@ -107,12 +73,11 @@ export default function CodeEditor({ value, onChange, language = 'plaintext', re
                     padding={12}
                     placeholder="Write your snippet here..."
                     textareaId="content"
-                    className="editor-input"
+                    className="ce-editor"
                     style={{
-                        fontFamily: "'JetBrains Mono', monospace",
+                        fontFamily: "'JetBrains Mono', 'Fira Code', monospace",
                         fontSize: 14,
                         lineHeight: 1.65,
-                        minHeight: '100%',
                     }}
                     readOnly={readonly}
                 />

@@ -41,6 +41,14 @@ export default function PasteViewPage() {
         fetchPaste();
     }, [id]);
 
+    // SEO: update page title dynamically when paste loads
+    useEffect(() => {
+        if (paste) {
+            document.title = `${paste.title || 'Untitled'} (${paste.language}) — SnipShare`;
+        }
+        return () => { document.title = 'SnipShare — Code Snippet Sharing'; };
+    }, [paste]);
+
     const fetchPaste = async () => {
         try {
             const params = password ? { password } : {};

@@ -1,223 +1,234 @@
-/* ── Outer wrapper ── */
-.code-editor {
+/* ═══════════════════════════════════════════
+   CodeEditor — structured like CodeBlock view
+   ═══════════════════════════════════════════ */
+
+.code-editor-wrap {
     display: flex;
     border: 1px solid var(--border);
     border-radius: var(--radius-sm);
     overflow: hidden;
     background: var(--code-bg);
+    /* Fixed height so it doesn't grow unbounded */
     height: 320px;
 }
 
-/* ── Gutter (line numbers) ─────────────────────────────────────── */
-/* Scrollbar hidden — JS syncs scrollTop to match the editor */
-.editor-gutter {
+/* ── Gutter ── */
+.ce-gutter {
     flex-shrink: 0;
-    min-width: 48px;
-    max-width: 48px;
+    width: 48px;
     overflow: hidden;
-    /* no scrollbar, JS drives scrollTop */
+    /* no scrollbar; grows with content */
     background: var(--code-gutter-bg);
     border-right: 1px solid var(--border);
     padding: 12px 0;
+    text-align: right;
     font-family: 'JetBrains Mono', monospace;
     font-size: 14px;
     line-height: 1.65;
     color: var(--code-gutter-text);
-    text-align: right;
     user-select: none;
 }
 
-.editor-line-number {
+.ce-line-no {
     height: calc(14px * 1.65);
-    /* matches editor font-size × line-height */
     padding-right: 10px;
 }
 
-/* ── Scroll area ── */
-/* This is the SINGLE element that actually scrolls.
-   Both the textarea and the PRE live inside here, so
-   they scroll together naturally — no transforms needed. */
-.editor-scroll-area {
+/* ── Scrollable body ── */
+/* This is THE single scroll container — textarea and pre live inside. */
+.ce-body {
     flex: 1;
     min-width: 0;
     overflow: auto;
-    /* the real scroll container */
     background: var(--code-bg);
+    /* Make sure both children grow to fill ce-body height */
+    display: flex;
+    flex-direction: column;
 }
 
-/* ── react-simple-code-editor inner elements ── */
-/* We do NOT override position or transform — let the library handle that.
-   We only control colors, font, and padding. */
-.editor-input {
-    min-width: 100%;
+/* react-simple-code-editor wrapper */
+.ce-editor {
+    flex: 1;
     min-height: 100%;
 }
 
-.editor-input .npm__react-simple-code-editor__textarea,
-.editor-input .npm__react-simple-code-editor__pre {
-    margin: 0 !important;
+/* The library creates a wrapping div; let it expand */
+.ce-editor>div {
+    min-height: 100%;
+}
+
+/* Textarea — invisible but receives input & touches */
+.ce-editor .npm__react-simple-code-editor__textarea {
+    background: transparent !important;
+    color: transparent !important;
+    -webkit-text-fill-color: transparent !important;
+    caret-color: var(--code-text) !important;
     font-family: 'JetBrains Mono', monospace !important;
     font-size: 14px !important;
     line-height: 1.65 !important;
-    tab-size: 4;
     white-space: pre !important;
-}
-
-/* The textarea is transparent so the highlighted pre shows through */
-.editor-input .npm__react-simple-code-editor__textarea {
-    background: transparent !important;
-    caret-color: var(--code-text) !important;
-    color: transparent !important;
-    -webkit-text-fill-color: transparent !important;
+    tab-size: 4;
     outline: none;
+    /* Allow natural scroll in ce-body */
+    overflow: hidden !important;
+    resize: none !important;
+    /* Touch/mobile caret fix */
+    -webkit-user-select: text;
+    user-select: text;
 }
 
-/* Highlighted layer — use the theme's code background */
-.editor-input .npm__react-simple-code-editor__pre {
+/* Highlighted layer — shows syntax colors */
+.ce-editor .npm__react-simple-code-editor__pre {
+    font-family: 'JetBrains Mono', monospace !important;
+    font-size: 14px !important;
+    line-height: 1.65 !important;
+    white-space: pre !important;
+    tab-size: 4;
     background: var(--code-bg) !important;
     color: var(--code-text) !important;
+    overflow: hidden !important;
+    pointer-events: none !important;
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   VS Code Dark+ token colours (shared by editor + CodeBlock view)
-   ═══════════════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════
+   VS Code Dark+  /  Light+ token colours
+   Uses CSS vars so they adapt to both themes
+   ═══════════════════════════════════════════ */
 
-/* Comments */
-.editor-input .token.comment,
-.editor-input .token.prolog,
-.editor-input .token.doctype,
-.editor-input .token.cdata,
-.code-wrapper .token.comment,
-.code-wrapper .token.prolog {
+/* -- Comments -------------------------------- */
+.ce-editor .token.comment,
+.ce-editor .token.prolog,
+.ce-editor .token.doctype,
+.ce-editor .token.cdata,
+.code-wrapper .token.comment {
     color: var(--code-comment) !important;
     font-style: italic;
 }
 
-/* Keywords: const, let, var, if, else, return, etc. */
-.editor-input .token.keyword,
-.editor-input .token.module,
+/* -- Keywords: const, let, class, if, return - */
+.ce-editor .token.keyword,
+.ce-editor .token.module,
 .code-wrapper .token.keyword {
     color: var(--code-keyword) !important;
     font-weight: 500;
 }
 
-/* Control-flow keywords */
-.editor-input .token.control,
-.editor-input .token.important,
+/* -- Control-flow: import, export, return ---- */
+.ce-editor .token.control,
+.ce-editor .token.important,
 .code-wrapper .token.control {
     color: #c586c0 !important;
 }
 
-/* Strings */
-.editor-input .token.string,
-.editor-input .token.char,
-.editor-input .token.template-string,
+/* -- Strings --------------------------------- */
+.ce-editor .token.string,
+.ce-editor .token.char,
+.ce-editor .token.template-string,
 .code-wrapper .token.string,
 .code-wrapper .token.char {
     color: var(--code-string) !important;
 }
 
-/* Numbers, booleans, null */
-.editor-input .token.number,
-.editor-input .token.boolean,
-.editor-input .token.null,
+/* -- Numbers, booleans ----------------------- */
+.ce-editor .token.number,
+.ce-editor .token.boolean,
+.ce-editor .token.null,
 .code-wrapper .token.number,
 .code-wrapper .token.boolean {
     color: var(--code-number) !important;
 }
 
-/* Function names */
-.editor-input .token.function,
+/* -- Functions ------------------------------- */
+.ce-editor .token.function,
 .code-wrapper .token.function {
     color: var(--code-function) !important;
 }
 
-/* Class names, types, builtins */
-.editor-input .token.class-name,
-.editor-input .token.builtin,
+/* -- Classes, types, builtins ---------------- */
+.ce-editor .token.class-name,
+.ce-editor .token.builtin,
 .code-wrapper .token.class-name,
 .code-wrapper .token.builtin {
     color: var(--code-type) !important;
 }
 
-/* HTML/JSX tags */
-.editor-input .token.tag,
+/* -- HTML / JSX tags ------------------------- */
+.ce-editor .token.tag,
 .code-wrapper .token.tag {
     color: var(--code-keyword) !important;
 }
 
-/* HTML attribute names */
-.editor-input .token.attr-name,
+/* -- HTML attr names: class, id, href -------- */
+.ce-editor .token.attr-name,
 .code-wrapper .token.attr-name {
     color: #9cdcfe !important;
 }
 
-/* HTML attribute values */
-.editor-input .token.attr-value,
+/* -- HTML attr values / string attr ---------- */
+.ce-editor .token.attr-value,
 .code-wrapper .token.attr-value {
     color: var(--code-string) !important;
 }
 
-/* CSS selectors */
-.editor-input .token.selector,
+/* -- CSS selectors --------------------------- */
+.ce-editor .token.selector,
 .code-wrapper .token.selector {
     color: #d7ba7d !important;
 }
 
-/* CSS/JSON properties */
-.editor-input .token.property,
+/* -- CSS / JSON property names --------------- */
+.ce-editor .token.property,
 .code-wrapper .token.property {
     color: #9cdcfe !important;
 }
 
-/* Operators, punctuation */
-.editor-input .token.operator,
-.editor-input .token.punctuation,
+/* -- Operators, punctuation ------------------ */
+.ce-editor .token.operator,
+.ce-editor .token.punctuation,
 .code-wrapper .token.operator,
 .code-wrapper .token.punctuation {
     color: var(--code-punctuation) !important;
 }
 
-/* Constants, symbols, variables */
-.editor-input .token.constant,
-.editor-input .token.symbol,
-.editor-input .token.variable,
+/* -- Constants, variables -------------------- */
+.ce-editor .token.constant,
+.ce-editor .token.symbol,
+.ce-editor .token.variable,
 .code-wrapper .token.constant,
 .code-wrapper .token.variable {
     color: #4fc1ff !important;
 }
 
-/* Regex patterns */
-.editor-input .token.regex,
+/* -- Regex ----------------------------------- */
+.ce-editor .token.regex,
 .code-wrapper .token.regex {
     color: #d16969 !important;
 }
 
-/* Namespace */
-.editor-input .token.namespace,
+/* -- Namespace / imports --------------------- */
+.ce-editor .token.namespace,
 .code-wrapper .token.namespace {
     color: var(--code-type) !important;
 }
 
-/* ───── Mobile ───── */
+/* ── Mobile ── */
 @media (max-width: 768px) {
-    .code-editor {
+    .code-editor-wrap {
         height: 240px;
     }
 
-    .editor-gutter {
-        min-width: 38px;
-        max-width: 38px;
+    .ce-gutter {
+        width: 38px;
         font-size: 12px;
     }
 
-    .editor-line-number {
+    .ce-line-no {
         height: calc(12px * 1.65);
         padding-right: 6px;
     }
 
-    .editor-input .npm__react-simple-code-editor__textarea,
-    .editor-input .npm__react-simple-code-editor__pre {
+    .ce-editor .npm__react-simple-code-editor__textarea,
+    .ce-editor .npm__react-simple-code-editor__pre {
         font-size: 12px !important;
     }
 }
