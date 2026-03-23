@@ -131,7 +131,7 @@ export default function HomePage() {
                     <form onSubmit={handleJoin} className="join-form">
                         <input
                             type="text"
-                            placeholder="Enter 6-digit code..."
+                            placeholder="Enter 6-digit code"
                             value={pasteCode}
                             onChange={(e) => setPasteCode(e.target.value)}
                             maxLength={10}
