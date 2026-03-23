@@ -56,17 +56,29 @@ export default function CodeEditor({ value, onChange, language = 'plaintext', re
         const root = editorWrapRef.current;
         if (!root) return;
 
-        const textarea = root.querySelector('.npm__react-simple-code-editor__textarea');
-        if (!textarea) return;
+        // Poll until react-simple-code-editor mounts its internal elements
+        const attach = () => {
+            const textarea = root.querySelector('.npm__react-simple-code-editor__textarea');
+            const pre = root.querySelector('.npm__react-simple-code-editor__pre');
+            if (!textarea || !pre) return;
 
-        const syncScroll = () => {
-            if (lineNumbersRef.current) {
-                lineNumbersRef.current.scrollTop = textarea.scrollTop;
-            }
+            const syncScroll = () => {
+                // Shift the highlighted pre layer to match the textarea scroll position
+                pre.style.transform = `translate(${-textarea.scrollLeft}px, ${-textarea.scrollTop}px)`;
+                // Keep line numbers in sync with vertical scroll
+                if (lineNumbersRef.current) {
+                    lineNumbersRef.current.scrollTop = textarea.scrollTop;
+                }
+            };
+
+            textarea.addEventListener('scroll', syncScroll, { passive: true });
+            syncScroll(); // initial paint
+            return () => textarea.removeEventListener('scroll', syncScroll);
         };
 
-        textarea.addEventListener('scroll', syncScroll);
-        return () => textarea.removeEventListener('scroll', syncScroll);
+        // Give the editor one frame to mount
+        const id = requestAnimationFrame(attach);
+        return () => cancelAnimationFrame(id);
     }, []);
 
     const prismLang = useMemo(() => LANG_MAP[language] || 'none', [language]);
