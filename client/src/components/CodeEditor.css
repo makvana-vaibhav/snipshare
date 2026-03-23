@@ -2,18 +2,18 @@
     border: 1px solid var(--border);
     border-radius: var(--radius-sm);
     overflow: hidden;
-    background: #11131a;
+    background: var(--code-bg);
 }
 
 .editor-container {
     display: flex;
-    min-height: 280px;
-    background: #11131a;
+    height: 264px;
+    background: var(--code-bg);
 }
 
 .line-numbers {
-    background: #0d1016;
-    color: #65708a;
+    background: var(--code-gutter-bg);
+    color: var(--code-gutter-text);
     padding: 12px 8px;
     text-align: right;
     font-family: 'JetBrains Mono', monospace;
@@ -33,32 +33,79 @@
 
 .editor-input {
     flex: 1;
-    width: 100%;
-    min-height: 280px;
-    margin: 0;
-    padding: 12px;
+    min-width: 0;
+    height: 264px;
     font-family: 'JetBrains Mono', monospace;
-    font-size: 14px;
-    line-height: 1.65;
-    border: none;
-    outline: none;
-    resize: none;
-    color: #e8eaf0;
-    background: #11131a;
-    white-space: pre;
-    overflow-wrap: normal;
-    caret-color: #ffffff;
+}
+
+.editor-input .npm__react-simple-code-editor__textarea,
+.editor-input .npm__react-simple-code-editor__pre {
+    margin: 0 !important;
+    height: 264px !important;
+    overflow: auto !important;
+    background: var(--code-bg) !important;
+    color: var(--code-text) !important;
+    font-family: 'JetBrains Mono', monospace !important;
+    font-size: 14px !important;
+    line-height: 1.65 !important;
+    tab-size: 2;
+}
+
+.editor-input .npm__react-simple-code-editor__textarea {
+    caret-color: var(--code-text) !important;
+}
+
+.editor-input .token.comment,
+.code-wrapper .token.comment {
+    color: var(--code-comment) !important;
+}
+
+.editor-input .token.keyword,
+.code-wrapper .token.keyword {
+    color: var(--code-keyword) !important;
+}
+
+.editor-input .token.string,
+.code-wrapper .token.string {
+    color: var(--code-string) !important;
+}
+
+.editor-input .token.number,
+.editor-input .token.boolean,
+.code-wrapper .token.number,
+.code-wrapper .token.boolean {
+    color: var(--code-number) !important;
+}
+
+.editor-input .token.function,
+.code-wrapper .token.function {
+    color: var(--code-function) !important;
+}
+
+.editor-input .token.operator,
+.editor-input .token.punctuation,
+.code-wrapper .token.operator,
+.code-wrapper .token.punctuation {
+    color: var(--code-punctuation) !important;
+}
+
+.editor-input .token.class-name,
+.editor-input .token.builtin,
+.code-wrapper .token.class-name,
+.code-wrapper .token.builtin {
+    color: var(--code-type) !important;
 }
 
 @media (max-width: 768px) {
     .editor-container,
     .editor-input {
-        min-height: 220px;
+        height: 220px;
     }
 
-    .editor-input {
-        font-size: 12px;
-        padding: 8px;
+    .editor-input .npm__react-simple-code-editor__textarea,
+    .editor-input .npm__react-simple-code-editor__pre {
+        height: 220px !important;
+        font-size: 12px !important;
     }
 
     .line-numbers {
