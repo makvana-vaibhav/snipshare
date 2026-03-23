@@ -1,35 +1,9 @@
-import { useState, useRef, useEffect } from 'react';
-import Prism from 'prismjs';
-import 'prismjs/themes/prism-tomorrow.css';
-import 'prismjs/components/prism-clike';
-import 'prismjs/components/prism-javascript';
-import 'prismjs/components/prism-python';
-import 'prismjs/components/prism-java';
-import 'prismjs/components/prism-c';
-import 'prismjs/components/prism-cpp';
-import 'prismjs/components/prism-bash';
-import 'prismjs/components/prism-json';
-import 'prismjs/components/prism-sql';
+import { useRef } from 'react';
 import './CodeEditor.css';
 
-const EDITOR_LANG_MAP = {
-    plaintext: 'none',
-    html: 'markup',
-};
-
-export default function CodeEditor({ value, onChange, language, onLanguageChange, readonly = false }) {
-    const [fullscreen, setFullscreen] = useState(false);
+export default function CodeEditor({ value, onChange, readonly = false }) {
     const textareaRef = useRef(null);
-    const highlightRef = useRef(null);
-
-    useEffect(() => {
-        if (highlightRef.current) {
-            highlightRef.current.textContent = value || '';
-            Prism.highlightElement(highlightRef.current);
-        }
-    }, [value, language]);
-
-    const prismLang = EDITOR_LANG_MAP[language] || language || 'none';
+    const lineNumbersRef = useRef(null);
 
     const handleKeyDown = (e) => {
         if (readonly) return;
@@ -48,12 +22,6 @@ export default function CodeEditor({ value, onChange, language, onLanguageChange
                 textarea.selectionStart = textarea.selectionEnd = start + 1;
             }, 0);
         }
-
-        // Cmd/Ctrl + K for fullscreen
-        if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
-            e.preventDefault();
-            setFullscreen(!fullscreen);
-        }
     };
 
     const handleInput = (e) => {
@@ -62,49 +30,36 @@ export default function CodeEditor({ value, onChange, language, onLanguageChange
         }
     };
 
+    const handleScroll = (e) => {
+        if (lineNumbersRef.current) {
+            lineNumbersRef.current.scrollTop = e.target.scrollTop;
+        }
+    };
+
     const lineCount = (value || '').split('\n').length;
 
     return (
-        <div className={`code-editor ${fullscreen ? 'fullscreen' : ''}`}>
-            <div className="editor-header">
-                <div className="editor-controls">
-                    <button
-                        className="btn btn-sm"
-                        onClick={() => setFullscreen(!fullscreen)}
-                        title="Fullscreen (Ctrl+K)"
-                    >
-                        {fullscreen ? '↙ Exit' : '↗ Fullscreen'}
-                    </button>
-                </div>
-            </div>
-
+        <div className="code-editor">
             <div className="editor-container">
-                <div className="line-numbers">
+                <div className="line-numbers" ref={lineNumbersRef} aria-hidden="true">
                     {Array.from({ length: lineCount }, (_, i) => (
                         <div key={i + 1} className="line-number">
                             {i + 1}
                         </div>
                     ))}
                 </div>
-
-                <div className="editor-input-wrapper">
-                    <textarea
-                        ref={textareaRef}
-                        value={value}
-                        onChange={handleInput}
-                        onKeyDown={handleKeyDown}
-                        placeholder="Paste your code here..."
-                        className="editor-input"
-                        spellCheck="false"
-                        readOnly={readonly}
-                    />
-                    <pre className="editor-highlight">
-                        <code
-                            ref={highlightRef}
-                            className={`language-${prismLang}`}
-                        />
-                    </pre>
-                </div>
+                <textarea
+                    ref={textareaRef}
+                    name="content"
+                    value={value}
+                    onChange={handleInput}
+                    onKeyDown={handleKeyDown}
+                    onScroll={handleScroll}
+                    placeholder="Paste your code here..."
+                    className="editor-input"
+                    spellCheck="false"
+                    readOnly={readonly}
+                />
             </div>
         </div>
     );

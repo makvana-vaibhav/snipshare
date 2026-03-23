@@ -58,8 +58,8 @@
 }
 
 .advanced-options {
-    background: #f8f9fa;
-    border: 1px solid #ddd;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border);
     border-radius: 6px;
     padding: 1rem;
     margin: 1rem 0;
@@ -87,12 +87,25 @@
     gap: 0.5rem;
     cursor: pointer;
     font-weight: 400;
+    color: var(--text-2);
+    text-transform: none;
+    letter-spacing: normal;
 }
 
 .advanced-options input[type="checkbox"] {
     width: 16px;
     height: 16px;
     cursor: pointer;
+}
+
+.advanced-options input[type="password"] {
+    background: rgba(24, 24, 27, 0.8);
+    border: 1px solid var(--border);
+    color: var(--text);
+}
+
+.advanced-options input[type="password"]::placeholder {
+    color: var(--text-3);
 }
 
 .form-actions {

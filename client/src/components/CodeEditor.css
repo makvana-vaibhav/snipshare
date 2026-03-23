@@ -1,178 +1,70 @@
 .code-editor {
-    border: 1px solid #ddd;
-    border-radius: 8px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
     overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    transition: all 0.3s ease;
-}
-
-.code-editor.fullscreen {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    border-radius: 0;
-    z-index: 9999;
-    background: white;
-}
-
-.editor-header {
-    background: #f5f5f5;
-    border-bottom: 1px solid #ddd;
-    padding: 10px 12px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.editor-controls {
-    display: flex;
-    gap: 8px;
-}
-
-.btn-sm {
-    padding: 4px 8px;
-    font-size: 12px;
-    background: #007bff;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background 0.2s;
-}
-
-.btn-sm:hover {
-    background: #0056b3;
+    background: #11131a;
 }
 
 .editor-container {
     display: flex;
-    flex: 1;
-    overflow: hidden;
-    background: #1e1e1e;
+    min-height: 280px;
+    background: #11131a;
 }
 
 .line-numbers {
-    background: #252526;
-    color: #6a9955;
-    padding: 12px 10px;
+    background: #0d1016;
+    color: #65708a;
+    padding: 12px 8px;
     text-align: right;
-    font-family: 'Courier New', monospace;
+    font-family: 'JetBrains Mono', monospace;
     font-size: 14px;
-    line-height: 1.5;
+    line-height: 1.65;
     user-select: none;
-    border-right: 1px solid #3e3e42;
-    overflow: hidden;
-    min-width: 50px;
+    border-right: 1px solid var(--border);
+    overflow: auto;
+    min-width: 52px;
+    max-width: 52px;
 }
 
 .line-number {
-    height: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-}
-
-.editor-input-wrapper {
-    flex: 1;
-    position: relative;
-    overflow: hidden;
-}
-
-.editor-input,
-.editor-highlight {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    margin: 0;
-    padding: 12px;
-    font-family: 'Courier New', monospace;
-    font-size: 14px;
-    line-height: 1.5;
-    border: none;
-    outline: none;
-    resize: none;
-    color: #d4d4d4;
-    background: transparent;
-    white-space: pre;
-    overflow-wrap: normal;
-    z-index: 2;
+    height: 1.65em;
+    padding-right: 6px;
 }
 
 .editor-input {
-    background: #1e1e1e;
-    color: transparent;
-    caret-color: white;
-    z-index: 3;
-}
-
-.editor-highlight {
-    background: #1e1e1e;
-    color: #d4d4d4;
-    pointer-events: none;
-    z-index: 1;
-}
-
-.editor-highlight code {
-    background: none;
-    color: inherit;
-    padding: 0;
-}
-
-/* Syntax highlighting colors */
-.editor-highlight {
-    color: #d4d4d4;
-}
-
-.editor-highlight code .punctuation {
-    color: #d4d4d4;
-}
-
-.editor-highlight code .string {
-    color: #ce9178;
-}
-
-.editor-highlight code .number {
-    color: #b5cea8;
-}
-
-.editor-highlight code .boolean {
-    color: #569cd6;
-}
-
-.editor-highlight code .keyword {
-    color: #569cd6;
-}
-
-.editor-highlight code .function {
-    color: #dcdcaa;
+    flex: 1;
+    width: 100%;
+    min-height: 280px;
+    margin: 0;
+    padding: 12px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    line-height: 1.65;
+    border: none;
+    outline: none;
+    resize: none;
+    color: #e8eaf0;
+    background: #11131a;
+    white-space: pre;
+    overflow-wrap: normal;
+    caret-color: #ffffff;
 }
 
 @media (max-width: 768px) {
-    .editor-input,
-    .editor-highlight {
+    .editor-container,
+    .editor-input {
+        min-height: 220px;
+    }
+
+    .editor-input {
         font-size: 12px;
         padding: 8px;
     }
 
     .line-numbers {
-        min-width: 40px;
+        min-width: 42px;
+        max-width: 42px;
         font-size: 12px;
-    }
-
-    .code-editor.fullscreen {
-        padding-top: 50px;
-    }
-
-    .editor-header {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        z-index: 10000;
+        padding: 8px 6px;
     }
 }
