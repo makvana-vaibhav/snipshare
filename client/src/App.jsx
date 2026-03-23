@@ -38,6 +38,9 @@ export default function App() {
                     <Route path="*" element={<NotFoundPage />} />
                 </Routes>
             </main>
+            <footer className="app-footer text-center text-muted text-sm" style={{ padding: '2rem 1rem', borderTop: '1px solid var(--border)', marginTop: 'auto' }}>
+                © 2026 SnipShare • Built by Vaibhav Makvana
+            </footer>
         </>
     );
 }

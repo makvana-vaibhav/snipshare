@@ -8,8 +8,8 @@
     border-radius: var(--radius-sm);
     overflow: hidden;
     background: var(--code-bg);
-    /* Fixed height so it doesn't grow unbounded */
-    height: 320px;
+    min-height: 280px;
+    height: auto;
 }
 
 /* ── Gutter ── */
@@ -214,7 +214,7 @@
 /* ── Mobile ── */
 @media (max-width: 768px) {
     .code-editor-wrap {
-        height: 240px;
+        min-height: 220px;
     }
 
     .ce-gutter {
