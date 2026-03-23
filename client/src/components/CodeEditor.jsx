@@ -71,12 +71,21 @@ export default function CodeEditor({ value, onChange, language = 'plaintext', re
 
     const prismLang = useMemo(() => LANG_MAP[language] || 'none', [language]);
 
-    const highlight = (code) => {
-        if (prismLang === 'none' || !Prism.languages[prismLang]) {
-            return Prism.util.encode(code);
-        }
+    const escapeHtml = (code) => code
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
 
-        return Prism.highlight(code, Prism.languages[prismLang], prismLang);
+    const highlight = (code) => {
+        try {
+            if (prismLang === 'none' || !Prism.languages[prismLang]) {
+                return escapeHtml(code);
+            }
+
+            return Prism.highlight(code, Prism.languages[prismLang], prismLang);
+        } catch (err) {
+            return escapeHtml(code);
+        }
     };
 
     const handleInput = (nextValue) => {

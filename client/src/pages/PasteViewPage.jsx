@@ -154,6 +154,12 @@ export default function PasteViewPage() {
                             <h1 className="paste-title">{paste.title || 'Untitled'}</h1>
                             <div className="paste-meta flex gap-1 items-center">
                                 <span className="badge">{paste.language}</span>
+                                {typeof paste.viewCount === 'number' && (
+                                    <>
+                                        <span className="text-muted text-sm">·</span>
+                                        <span className="text-muted text-sm">👁 {paste.viewCount}</span>
+                                    </>
+                                )}
                                 <span className="text-muted text-sm">·</span>
                                 <span className="text-muted text-sm">{formatDate(paste.createdAt)}</span>
                                 {paste.expiresAt && (
@@ -173,6 +179,8 @@ export default function PasteViewPage() {
                             </div>
                         </div>
                         <div className="paste-actions">
+                            <CopyButton text={paste.slug} label="Code" />
+                            <CopyButton text={window.location.href} label="Link" />
                             <CopyButton text={paste.content} label="Content" />
                             {isOwner && (
                                 <>

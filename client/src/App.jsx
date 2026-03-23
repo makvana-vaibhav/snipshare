@@ -6,6 +6,7 @@ import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
 import DashboardPage from './pages/DashboardPage';
 import NotFoundPage from './pages/NotFoundPage';
+import EditPastePage from './pages/EditPastePage';
 import ProtectedRoute from './components/ProtectedRoute';
 
 export default function App() {
@@ -23,6 +24,14 @@ export default function App() {
                         element={
                             <ProtectedRoute>
                                 <DashboardPage />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/paste/:id/edit"
+                        element={
+                            <ProtectedRoute>
+                                <EditPastePage />
                             </ProtectedRoute>
                         }
                     />
