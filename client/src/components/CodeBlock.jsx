@@ -71,15 +71,25 @@ export default function CodeBlock({ content, language = 'plaintext' }) {
 
     const prismLang = LANG_MAP[language] || 'none';
     const langClass = prismLang !== 'none' ? `language-${prismLang}` : '';
+    const lineCount = (content || '').split('\n').length;
 
     return (
         <div className="code-wrapper">
             <div className="code-scroll">
-                <pre className={langClass || 'language-none'} style={{ background: 'transparent' }}>
-                    <code ref={codeRef} className={langClass}>
-                        {content}
-                    </code>
-                </pre>
+                <div className="code-with-lines">
+                    <div className="code-line-numbers" aria-hidden="true">
+                        {Array.from({ length: lineCount }, (_, i) => (
+                            <div key={i + 1} className="code-line-number">
+                                {i + 1}
+                            </div>
+                        ))}
+                    </div>
+                    <pre className={langClass || 'language-none'} style={{ background: 'transparent' }}>
+                        <code ref={codeRef} className={langClass}>
+                            {content}
+                        </code>
+                    </pre>
+                </div>
             </div>
         </div>
     );

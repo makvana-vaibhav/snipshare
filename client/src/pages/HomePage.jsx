@@ -66,13 +66,9 @@ export default function HomePage() {
         content: '',
         language: 'plaintext',
         expiry: 'never',
-        isPublic: false,
-        password: '',
-        selfDestruct: false,
     });
     const [loading, setLoading] = useState(false);
     const [pasteCode, setPasteCode] = useState('');
-    const [showAdvanced, setShowAdvanced] = useState(false);
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
@@ -110,6 +106,12 @@ export default function HomePage() {
         }
     };
 
+    const preventAccidentalSubmit = (e) => {
+        if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA') {
+            e.preventDefault();
+        }
+    };
+
     const handleJoin = (e) => {
         e.preventDefault();
         if (pasteCode.trim()) {
@@ -139,7 +141,7 @@ export default function HomePage() {
                 </div>
 
                 <div className="card">
-                    <form onSubmit={handleSubmit}>
+                    <form onSubmit={handleSubmit} onKeyDown={preventAccidentalSubmit}>
                         <div className="form-group">
                             <label htmlFor="title">Title (optional)</label>
                             <input
@@ -180,53 +182,6 @@ export default function HomePage() {
                                 language={form.language}
                             />
                         </div>
-
-                        <button
-                            type="button"
-                            className="btn btn-link"
-                            onClick={() => setShowAdvanced(!showAdvanced)}
-                        >
-                            {showAdvanced ? '▼ Advanced Options' : '▶ Advanced Options'}
-                        </button>
-
-                        {showAdvanced && (
-                            <div className="advanced-options">
-                                <div className="form-group">
-                                    <label>
-                                        <input
-                                            type="checkbox"
-                                            name="isPublic"
-                                            checked={form.isPublic}
-                                            onChange={handleChange}
-                                        />
-                                        Make Public (shareable)
-                                    </label>
-                                </div>
-                                <div className="form-group">
-                                    <label>
-                                        <input
-                                            type="checkbox"
-                                            name="selfDestruct"
-                                            checked={form.selfDestruct}
-                                            onChange={handleChange}
-                                        />
-                                        Self-destruct after first view
-                                    </label>
-                                </div>
-                                <div className="form-group">
-                                    <label htmlFor="password">Password Protect (optional)</label>
-                                    <input
-                                        id="password"
-                                        name="password"
-                                        type="password"
-                                        placeholder="Leave blank for no password"
-                                        value={form.password}
-                                        onChange={handleChange}
-                                        maxLength={50}
-                                    />
-                                </div>
-                            </div>
-                        )}
 
                         <div className="form-actions">
                             <span className="text-xs text-muted">

@@ -100,8 +100,6 @@ export default function PasteViewPage() {
         navigate(`/paste/${id}/edit`);
     };
 
-    const pasteUrl = window.location.href;
-
     if (loading) return <div className="spinner" style={{ marginTop: '6rem' }} />;
 
     if (passwordRequired) {
@@ -156,12 +154,6 @@ export default function PasteViewPage() {
                             <h1 className="paste-title">{paste.title || 'Untitled'}</h1>
                             <div className="paste-meta flex gap-1 items-center">
                                 <span className="badge">{paste.language}</span>
-                                {paste.viewCount > 0 && (
-                                    <>
-                                        <span className="text-muted text-sm">·</span>
-                                        <span className="text-muted text-sm">👁 {paste.viewCount}</span>
-                                    </>
-                                )}
                                 <span className="text-muted text-sm">·</span>
                                 <span className="text-muted text-sm">{formatDate(paste.createdAt)}</span>
                                 {paste.expiresAt && (
@@ -181,11 +173,6 @@ export default function PasteViewPage() {
                             </div>
                         </div>
                         <div className="paste-actions">
-                            <div className="badge code-badge">
-                                CODE: {paste.slug}
-                            </div>
-                            <CopyButton text={paste.slug} label="Code" />
-                            <CopyButton text={pasteUrl} label="Link" />
                             <CopyButton text={paste.content} label="Content" />
                             {isOwner && (
                                 <>

@@ -303,6 +303,28 @@ select option {
   max-height: 70vh;
 }
 
+.code-with-lines {
+  display: flex;
+  min-width: max-content;
+}
+
+.code-line-numbers {
+  background: #0d1016;
+  color: #65708a;
+  border-right: 1px solid var(--border);
+  padding: 1.5rem 0.5rem;
+  min-width: 52px;
+  text-align: right;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 0.875rem;
+  line-height: 1.7;
+  user-select: none;
+}
+
+.code-line-number {
+  padding-right: 0.35rem;
+}
+
 pre[class*='language-'] {
   margin: 0;
   padding: 1.5rem;
