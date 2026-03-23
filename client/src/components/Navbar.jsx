@@ -39,7 +39,7 @@ export default function Navbar() {
                         {theme === 'dark' ? '☀ Light' : '🌙 Dark'}
                     </button>
                     <Link to="/" className="nav-link btn btn-primary btn-sm hide-sm">
-                        + New Paste
+                        + New Snippet
                     </Link>
                     {user ? (
                         <>

@@ -97,10 +97,10 @@ export default function HomePage() {
         setLoading(true);
         try {
             const res = await api.post('/paste', form);
-            toast.success('Paste created!');
+            toast.success('Snippet created!');
             navigate(`/paste/${res.data.slug}`);
         } catch (err) {
-            toast.error(err.response?.data?.message || 'Failed to create paste');
+            toast.error(err.response?.data?.message || 'Failed to create snippet');
         } finally {
             setLoading(false);
         }
@@ -124,7 +124,7 @@ export default function HomePage() {
             <div className="container">
                 <div className="home-hero">
                     <h1>Share code <span className="hero-accent">instantly</span></h1>
-                    <p className="hero-sub">Paste, share, and view code snippets with syntax highlighting.</p>
+                    <p className="hero-sub">Create, share, and view code snippets with syntax highlighting.</p>
 
                     <form onSubmit={handleJoin} className="join-form">
                         <input
@@ -135,7 +135,7 @@ export default function HomePage() {
                             maxLength={10}
                         />
                         <button type="submit" className="btn btn-secondary" disabled={!pasteCode.trim()}>
-                            Get Paste
+                            Get Snippet
                         </button>
                     </form>
                 </div>
@@ -188,7 +188,7 @@ export default function HomePage() {
                                 {form.content.length.toLocaleString()} chars
                             </span>
                             <button type="submit" className="btn btn-primary btn-lg" disabled={loading}>
-                                {loading ? 'Creating…' : '✦ Create Paste'}
+                                {loading ? 'Creating…' : '✦ Create Snippet'}
                             </button>
                         </div>
                     </form>

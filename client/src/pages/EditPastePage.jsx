@@ -50,7 +50,7 @@ export default function EditPastePage() {
                 const paste = res.data;
 
                 if (!user || !paste.userId || paste.userId !== (user._id || user.id)) {
-                    toast.error('Not authorized to edit this paste');
+                    toast.error('Not authorized to edit this snippet');
                     navigate(`/paste/${id}`);
                     return;
                 }
@@ -61,7 +61,7 @@ export default function EditPastePage() {
                     language: paste.language || 'plaintext',
                 });
             } catch (err) {
-                toast.error(err.response?.data?.message || 'Failed to load paste');
+                toast.error(err.response?.data?.message || 'Failed to load snippet');
                 navigate('/dashboard');
             } finally {
                 setLoading(false);
@@ -93,10 +93,10 @@ export default function EditPastePage() {
                 content: form.content,
                 language: form.language,
             });
-            toast.success('Paste updated');
+            toast.success('Snippet updated');
             navigate(`/paste/${id}`);
         } catch (err) {
-            toast.error(err.response?.data?.message || 'Failed to update paste');
+            toast.error(err.response?.data?.message || 'Failed to update snippet');
         } finally {
             setSaving(false);
         }
@@ -108,7 +108,7 @@ export default function EditPastePage() {
         <div className="page fade-in">
             <div className="container">
                 <div className="card edit-card">
-                    <h1 className="edit-title">Edit Paste</h1>
+                    <h1 className="edit-title">Edit Snippet</h1>
                     <form onSubmit={handleSubmit}>
                         <div className="form-group">
                             <label htmlFor="title">Title (optional)</label>

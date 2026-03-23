@@ -53,11 +53,11 @@ export default function PasteViewPage() {
                 setPasswordRequired(true);
                 setError('This paste is password protected.');
             } else if (status === 410) {
-                setError('This paste has expired.');
+                setError('This snippet has expired.');
             } else if (status === 404) {
-                setError('Paste not found.');
+                setError('Snippet not found.');
             } else {
-                setError('Failed to load paste.');
+                setError('Failed to load snippet.');
             }
         } finally {
             setLoading(false);
@@ -88,7 +88,7 @@ export default function PasteViewPage() {
         setDeleting(true);
         try {
             await api.delete(`/paste/${id}`);
-            toast.success('Paste deleted');
+            toast.success('Snippet deleted');
             navigate('/dashboard');
         } catch (err) {
             toast.error(err.response?.data?.message || 'Failed to delete');
@@ -134,8 +134,8 @@ export default function PasteViewPage() {
                     <div className="error-state card text-center">
                         <div className="error-icon">⚠</div>
                         <h2>{error}</h2>
-                        <p className="text-muted mt-1">The paste might have expired or never existed.</p>
-                        <Link to="/" className="btn btn-primary mt-2">Create New Paste</Link>
+                        <p className="text-muted mt-1">The snippet might have expired or never existed.</p>
+                        <Link to="/" className="btn btn-primary mt-2">Create New Snippet</Link>
                     </div>
                 </div>
             </div>
@@ -210,9 +210,9 @@ export default function PasteViewPage() {
 
                 {/* Footer */}
                 <div className="paste-footer">
-                    <Link to="/" className="btn btn-secondary btn-sm">+ New Paste</Link>
+                    <Link to="/" className="btn btn-secondary btn-sm">+ New Snippet</Link>
                     <div className="share-url flex gap-1 items-center">
-                        <span className="text-muted text-sm">Share Code:</span>
+                        <span className="text-muted text-sm">Snippet Code:</span>
                         <span className="text-muted text-sm font-mono" style={{ color: 'var(--text)', fontSize: '1.05rem', letterSpacing: '0.1rem' }}>{paste.slug}</span>
                     </div>
                 </div>

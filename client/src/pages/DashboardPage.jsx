@@ -66,7 +66,7 @@ export default function DashboardPage() {
                         <p className="text-muted text-sm">Welcome, <strong>{user?.username}</strong></p>
                     </div>
                     <div className="dash-header-actions">
-                        <Link to="/" className="btn btn-primary">+ New Paste</Link>
+                        <Link to="/" className="btn btn-primary">+ New Snippet</Link>
                         <button onClick={handleLogout} className="btn btn-secondary">Logout</button>
                     </div>
                 </div>
@@ -75,7 +75,7 @@ export default function DashboardPage() {
                 <div className="stats-grid">
                     <div className="stat-card">
                         <div className="stat-value">{pastes.length}</div>
-                        <div className="stat-label">Total Pastes</div>
+                        <div className="stat-label">Total Snippets</div>
                     </div>
                     <div className="stat-card">
                         <div className="stat-value">{totalViews}</div>
@@ -91,14 +91,14 @@ export default function DashboardPage() {
                     <div className="spinner" />
                 ) : pastes.length === 0 ? (
                     <div className="empty-state card">
-                        <h3>No pastes yet</h3>
-                        <p>Create your first paste to get started.</p>
-                        <Link to="/" className="btn btn-primary mt-2">Create Paste</Link>
+                        <h3>No snippets yet</h3>
+                        <p>Create your first snippet to get started.</p>
+                        <Link to="/" className="btn btn-primary mt-2">Create Snippet</Link>
                     </div>
                 ) : (
                     <>
                         <p className="text-muted text-sm" style={{ marginBottom: '0.75rem' }}>
-                            {pastes.length} paste{pastes.length !== 1 ? 's' : ''}
+                            {pastes.length} snippet{pastes.length !== 1 ? 's' : ''}
                         </p>
                         <div className="paste-list">
                             {pastes.map((p) => (

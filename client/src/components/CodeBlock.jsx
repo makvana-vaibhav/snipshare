@@ -24,9 +24,6 @@ import 'prismjs/components/prism-sql';
 import 'prismjs/components/prism-bash';
 import 'prismjs/components/prism-markdown';
 
-// Prism dark theme
-import 'prismjs/themes/prism-tomorrow.css';
-
 const LANG_MAP = {
     plaintext: 'none',
     javascript: 'javascript',
