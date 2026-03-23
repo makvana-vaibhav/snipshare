@@ -20,7 +20,7 @@ export default function Navbar() {
                 </Link>
 
                 <nav className="navbar-nav">
-                    <Link to="/" className="nav-link btn btn-primary btn-sm">
+                    <Link to="/" className="nav-link btn btn-primary btn-sm hide-sm">
                         + New Paste
                     </Link>
                     {user ? (

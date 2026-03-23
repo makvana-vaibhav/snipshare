@@ -103,7 +103,7 @@ export default function PasteViewPage() {
                             </div>
                         </div>
                         <div className="paste-actions">
-                            <div className="badge" style={{ fontSize: '1rem', padding: '0.4rem 0.8rem', letterSpacing: '0.1rem', alignSelf: 'center' }}>
+                            <div className="badge code-badge">
                                 CODE: {paste.slug}
                             </div>
                             <CopyButton text={paste.slug} label="Code" />
