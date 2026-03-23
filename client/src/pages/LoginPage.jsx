@@ -3,9 +3,11 @@ import { Link, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import api from '../api/axiosInstance';
 import { useAuth } from '../context/AuthContext';
+import useSEO from '../hooks/useSEO';
 import './AuthPage.css';
 
 export default function LoginPage() {
+    useSEO('Login - Manage SnipShare Account', 'Log in to your SnipShare dashboard to track snippet views, manage expiration times, and review your online code sharing history.');
     const { login } = useAuth();
     const navigate = useNavigate();
     const [form, setForm] = useState({ email: '', password: '', rememberMe: false });

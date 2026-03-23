@@ -5,6 +5,7 @@ import api from '../api/axiosInstance';
 import { useAuth } from '../context/AuthContext';
 import CodeBlock from '../components/CodeBlock';
 import CopyButton from '../components/CopyButton';
+import useSEO from '../hooks/useSEO';
 import './PasteViewPage.css';
 
 function formatDate(iso) {
@@ -26,6 +27,7 @@ function formatExpiry(expiresAt) {
 }
 
 export default function PasteViewPage() {
+    useSEO('View Snippet - SnipShare', 'Enter your 6-digit code to securely load a shared snippet. Quick note sharing and code retrieval made easy and perfectly formatted.');
     const { id } = useParams();
     const navigate = useNavigate();
     const { user } = useAuth();
@@ -40,14 +42,6 @@ export default function PasteViewPage() {
     useEffect(() => {
         fetchPaste();
     }, [id]);
-
-    // SEO: update page title dynamically when paste loads
-    useEffect(() => {
-        if (paste) {
-            document.title = `${paste.title || 'Untitled'} (${paste.language}) — SnipShare`;
-        }
-        return () => { document.title = 'SnipShare — Code Snippet Sharing'; };
-    }, [paste]);
 
     const fetchPaste = async () => {
         try {

@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom';
+import useSEO from '../hooks/useSEO';
 
 export default function NotFoundPage() {
+    useSEO('Page Not Found - SnipShare', "We couldn't find the page or snippet you're looking for. The code may have expired or been deleted from our online snippet tool.");
     return (
         <div className="page fade-in">
             <div className="container text-center" style={{ paddingTop: '5rem' }}>
@@ -8,10 +10,7 @@ export default function NotFoundPage() {
                     fontSize: '5rem',
                     lineHeight: 1,
                     marginBottom: '1rem',
-                    background: 'linear-gradient(135deg, var(--accent), var(--accent-2))',
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
-                    backgroundClip: 'text',
+                    color: 'var(--accent)',
                 }}>
                     404
                 </div>

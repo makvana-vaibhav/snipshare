@@ -4,6 +4,7 @@ import toast from 'react-hot-toast';
 import api from '../api/axiosInstance';
 import { useAuth } from '../context/AuthContext';
 import CopyButton from '../components/CopyButton';
+import useSEO from '../hooks/useSEO';
 import './DashboardPage.css';
 
 function timeAgo(iso) {
@@ -17,6 +18,7 @@ function timeAgo(iso) {
 }
 
 export default function DashboardPage() {
+    useSEO('Dashboard - Manage Snippets', 'View your active snippets, check view counts, and organize your online code sharing history directly from the SnipShare user dashboard.');
     const { user, logout } = useAuth();
     const navigate = useNavigate();
     const [pastes, setPastes] = useState([]);

@@ -4,6 +4,7 @@ import toast from 'react-hot-toast';
 import api from '../api/axiosInstance';
 import { useAuth } from '../context/AuthContext';
 import CodeEditor from '../components/CodeEditor';
+import useSEO from '../hooks/useSEO';
 import './EditPastePage.css';
 
 const LANGUAGES = [
@@ -31,6 +32,7 @@ const LANGUAGES = [
 ];
 
 export default function EditPastePage() {
+    useSEO('Edit Snippet - SnipShare', 'Update the contents of an existing snippet. Easily edit code or text and save changes immediately for anyone checking your short code.');
     const { id } = useParams();
     const navigate = useNavigate();
     const { user } = useAuth();

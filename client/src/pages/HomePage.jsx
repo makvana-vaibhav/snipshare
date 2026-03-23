@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import api from '../api/axiosInstance';
 import CodeEditor from '../components/CodeEditor';
+import useSEO from '../hooks/useSEO';
 import './HomePage.css';
 
 const LANGUAGES = [
@@ -60,6 +61,7 @@ const detectLanguage = (content) => {
 };
 
 export default function HomePage() {
+    useSEO('SnipShare - Share Code Online Instantly', 'Use our online snippet tool to create and share text or code using a secure 6-digit short code. No long links required.');
     const navigate = useNavigate();
     const [form, setForm] = useState({
         title: '',
