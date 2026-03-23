@@ -12,9 +12,11 @@ const app = express();
 // Connect to MongoDB
 connectDB();
 
+app.get('/', (req, res) => res.send('SnipShare API is running! 🚀'));
+
 // CORS
 app.use(cors({
-    origin: process.env.CLIENT_ORIGIN || 'http://localhost:5173',
+    origin: (origin, callback) => callback(null, true),
     credentials: true,
 }));
 
