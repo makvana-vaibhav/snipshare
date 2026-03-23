@@ -9,6 +9,7 @@
     overflow: hidden;
     background: var(--code-bg);
     min-height: 280px;
+    max-height: 55vh;
     height: auto;
 }
 
