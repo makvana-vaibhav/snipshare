@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import './Navbar.css';
 
@@ -38,19 +38,19 @@ export default function Navbar() {
                     <button onClick={toggleTheme} className="btn btn-ghost btn-sm theme-btn" title="Toggle theme">
                         {theme === 'dark' ? '☀ Light' : '🌙 Dark'}
                     </button>
-                    <Link to="/" className="nav-link btn btn-primary btn-sm hide-sm">
+                    <NavLink to="/" end className="nav-link btn btn-primary btn-sm hide-sm" style={{ color: '#0A0A0A' }}>
                         + New Snippet
-                    </Link>
+                    </NavLink>
                     {user ? (
                         <>
-                            <Link to="/dashboard" className="nav-link">Dashboard</Link>
+                            <NavLink to="/dashboard" className="nav-link">Dashboard</NavLink>
                             <button onClick={handleLogout} className="btn btn-ghost btn-sm">
                                 Logout
                             </button>
                         </>
                     ) : (
                         <>
-                            <Link to="/login" className="nav-link">Login</Link>
+                            <NavLink to="/login" className="nav-link">Login</NavLink>
                             <Link to="/signup" className="btn btn-secondary btn-sm">Sign Up</Link>
                         </>
                     )}

@@ -62,7 +62,7 @@ export default function LoginPage() {
                             />
                         </div>
                         <div className="form-group">
-                            <label>
+                            <label className="checkbox-label">
                                 <input
                                     name="rememberMe"
                                     type="checkbox"

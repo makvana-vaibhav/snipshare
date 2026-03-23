@@ -52,8 +52,9 @@
     transition: color var(--transition);
 }
 
-.nav-link:hover {
-    color: var(--text);
+.nav-link:hover,
+.nav-link.active {
+    color: var(--accent);
 }
 
 .theme-btn {

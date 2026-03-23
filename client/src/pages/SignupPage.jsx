@@ -72,7 +72,7 @@ export default function SignupPage() {
                             />
                         </div>
                         <div className="form-group">
-                            <label>
+                            <label className="checkbox-label">
                                 <input
                                     name="rememberMe"
                                     type="checkbox"
