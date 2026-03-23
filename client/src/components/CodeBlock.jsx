@@ -2,6 +2,8 @@ import { useEffect, useRef } from 'react';
 import Prism from 'prismjs';
 
 // Import common Prism language components
+import 'prismjs/components/prism-markup';
+import 'prismjs/components/prism-clike';
 import 'prismjs/components/prism-javascript';
 import 'prismjs/components/prism-typescript';
 import 'prismjs/components/prism-python';
@@ -48,9 +50,6 @@ const LANG_MAP = {
     bash: 'bash',
     markdown: 'markdown',
 };
-
-// Import core markup
-import 'prismjs/components/prism-markup';
 
 export default function CodeBlock({ content, language = 'plaintext' }) {
     const codeRef = useRef(null);

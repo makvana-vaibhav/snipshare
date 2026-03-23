@@ -1,14 +1,21 @@
 import { useState, useRef, useEffect } from 'react';
 import Prism from 'prismjs';
 import 'prismjs/themes/prism-tomorrow.css';
+import 'prismjs/components/prism-clike';
 import 'prismjs/components/prism-javascript';
 import 'prismjs/components/prism-python';
 import 'prismjs/components/prism-java';
+import 'prismjs/components/prism-c';
 import 'prismjs/components/prism-cpp';
 import 'prismjs/components/prism-bash';
 import 'prismjs/components/prism-json';
 import 'prismjs/components/prism-sql';
 import './CodeEditor.css';
+
+const EDITOR_LANG_MAP = {
+    plaintext: 'none',
+    html: 'markup',
+};
 
 export default function CodeEditor({ value, onChange, language, onLanguageChange, readonly = false }) {
     const [fullscreen, setFullscreen] = useState(false);
@@ -21,6 +28,8 @@ export default function CodeEditor({ value, onChange, language, onLanguageChange
             Prism.highlightElement(highlightRef.current);
         }
     }, [value, language]);
+
+    const prismLang = EDITOR_LANG_MAP[language] || language || 'none';
 
     const handleKeyDown = (e) => {
         if (readonly) return;
@@ -92,7 +101,7 @@ export default function CodeEditor({ value, onChange, language, onLanguageChange
                     <pre className="editor-highlight">
                         <code
                             ref={highlightRef}
-                            className={`language-${language || 'plaintext'}`}
+                            className={`language-${prismLang}`}
                         />
                     </pre>
                 </div>
