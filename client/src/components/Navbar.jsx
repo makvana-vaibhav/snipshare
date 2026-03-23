@@ -30,7 +30,7 @@ export default function Navbar() {
         <header className="navbar">
             <div className="navbar-inner">
                 <Link to="/" className="navbar-brand">
-                    <span className="brand-icon">✦</span>
+                    <img src="/favicon.png" alt="SnipShare Logo" className="brand-logo" />
                     <span className="brand-name">SnipShare</span>
                 </Link>
 

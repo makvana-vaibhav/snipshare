@@ -33,23 +33,10 @@
     color: var(--text);
 }
 
-.brand-icon {
-    color: var(--accent);
-    font-size: 1.3rem;
-    line-height: 1;
-    animation: pulse 2.5s ease-in-out infinite;
-}
-
-@keyframes pulse {
-
-    0%,
-    100% {
-        opacity: 1;
-    }
-
-    50% {
-        opacity: 0.6;
-    }
+.brand-logo {
+    width: 26px;
+    height: 26px;
+    object-fit: contain;
 }
 
 .navbar-nav {
