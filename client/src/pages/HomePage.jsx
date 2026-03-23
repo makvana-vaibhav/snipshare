@@ -124,7 +124,7 @@ export default function HomePage() {
             <div className="container">
                 <div className="home-hero">
                     <h1>Share code <span className="hero-accent">instantly</span></h1>
-                    <p className="hero-sub">Create, share, and view code snippets with syntax highlighting.</p>
+                    <p className="hero-sub">Create a snippet, get a code, and share it in seconds.</p>
 
                     <form onSubmit={handleJoin} className="join-form">
                         <input
