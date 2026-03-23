@@ -1,0 +1,60 @@
+.dash-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+}
+
+.dash-header h1 {
+    font-size: 1.7rem;
+    margin-bottom: 0.25rem;
+}
+
+.paste-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.paste-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    transition: border-color var(--transition), background var(--transition);
+}
+
+.paste-item:hover {
+    border-color: var(--accent);
+    background: var(--surface-2);
+}
+
+.paste-item-main {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    min-width: 0;
+}
+
+.paste-item-title {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 500px;
+}
+
+.paste-item-title:hover {
+    color: var(--accent);
+}
+
+.paste-item-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-shrink: 0;
+}

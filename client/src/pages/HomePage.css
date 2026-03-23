@@ -1,0 +1,58 @@
+.home-hero {
+    text-align: center;
+    padding: 3rem 0 2rem;
+}
+
+.home-hero h1 {
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+}
+
+.hero-accent {
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.hero-sub {
+    color: var(--text-2);
+    font-size: 1.05rem;
+}
+
+.join-form {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    max-width: 380px;
+    margin: 1.5rem auto 0;
+}
+
+.join-form input {
+    text-align: center;
+    letter-spacing: 0.1rem;
+    font-size: 1.05rem;
+    font-weight: 500;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+@media (max-width: 500px) {
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+.form-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 0.5rem;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
