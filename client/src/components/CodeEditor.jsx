@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import Editor from 'react-simple-code-editor';
 import Prism from 'prismjs';
 import 'prismjs/components/prism-markup';
@@ -49,56 +49,40 @@ const LANG_MAP = {
 };
 
 export default function CodeEditor({ value, onChange, language = 'plaintext', readonly = false }) {
-    const editorWrapRef = useRef(null);
     const lineNumbersRef = useRef(null);
+    const scrollerRef = useRef(null);
 
+    // Sync line numbers scroll when the editor scrolls
     useEffect(() => {
-        const root = editorWrapRef.current;
-        if (!root) return;
+        const scroller = scrollerRef.current;
+        if (!scroller) return;
 
-        // Poll until react-simple-code-editor mounts its internal elements
-        const attach = () => {
-            const textarea = root.querySelector('.npm__react-simple-code-editor__textarea');
-            const pre = root.querySelector('.npm__react-simple-code-editor__pre');
-            if (!textarea || !pre) return;
-
-            const syncScroll = () => {
-                // Shift the highlighted pre layer to match the textarea scroll position
-                pre.style.transform = `translate(${-textarea.scrollLeft}px, ${-textarea.scrollTop}px)`;
-                // Keep line numbers in sync with vertical scroll
-                if (lineNumbersRef.current) {
-                    lineNumbersRef.current.scrollTop = textarea.scrollTop;
-                }
-            };
-
-            textarea.addEventListener('scroll', syncScroll, { passive: true });
-            syncScroll(); // initial paint
-            return () => textarea.removeEventListener('scroll', syncScroll);
+        const onScroll = () => {
+            if (lineNumbersRef.current) {
+                lineNumbersRef.current.scrollTop = scroller.scrollTop;
+            }
         };
 
-        // Give the editor one frame to mount
-        const id = requestAnimationFrame(attach);
-        return () => cancelAnimationFrame(id);
+        // The editor's inner scrollable div is the one we injected via ref
+        scroller.addEventListener('scroll', onScroll, { passive: true });
+        return () => scroller.removeEventListener('scroll', onScroll);
     }, []);
 
     const prismLang = useMemo(() => LANG_MAP[language] || 'none', [language]);
 
-    const escapeHtml = (code) => code
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;');
+    const escapeHtml = (code) =>
+        code.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
-    const highlight = (code) => {
+    const highlight = useCallback((code) => {
         try {
             if (prismLang === 'none' || !Prism.languages[prismLang]) {
                 return escapeHtml(code);
             }
-
             return Prism.highlight(code, Prism.languages[prismLang], prismLang);
-        } catch (err) {
+        } catch {
             return escapeHtml(code);
         }
-    };
+    }, [prismLang]);
 
     const handleInput = (nextValue) => {
         if (readonly) return;
@@ -108,15 +92,14 @@ export default function CodeEditor({ value, onChange, language = 'plaintext', re
     const lineCount = (value || '').split('\n').length;
 
     return (
-        <div className="code-editor" ref={editorWrapRef}>
-            <div className="editor-container">
-                <div className="line-numbers" ref={lineNumbersRef} aria-hidden="true">
-                    {Array.from({ length: lineCount }, (_, i) => (
-                        <div key={i + 1} className="line-number">
-                            {i + 1}
-                        </div>
-                    ))}
-                </div>
+        <div className="code-editor">
+            <div className="editor-gutter" ref={lineNumbersRef} aria-hidden="true">
+                {Array.from({ length: lineCount }, (_, i) => (
+                    <div key={i + 1} className="editor-line-number">{i + 1}</div>
+                ))}
+            </div>
+            {/* This outer div becomes the scroll container */}
+            <div className="editor-scroll-area" ref={scrollerRef}>
                 <Editor
                     value={value}
                     onValueChange={handleInput}
@@ -126,9 +109,10 @@ export default function CodeEditor({ value, onChange, language = 'plaintext', re
                     textareaId="content"
                     className="editor-input"
                     style={{
-                        fontFamily: 'JetBrains Mono, monospace',
+                        fontFamily: "'JetBrains Mono', monospace",
                         fontSize: 14,
                         lineHeight: 1.65,
+                        minHeight: '100%',
                     }}
                     readOnly={readonly}
                 />

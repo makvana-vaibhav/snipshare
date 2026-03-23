@@ -1,53 +1,58 @@
-/* ── Code editor wrapper ── */
+/* ── Outer wrapper ── */
 .code-editor {
+    display: flex;
     border: 1px solid var(--border);
     border-radius: var(--radius-sm);
     overflow: hidden;
-    background: #1e1e1e;
-}
-
-.editor-container {
-    display: flex;
+    background: var(--code-bg);
     height: 320px;
-    overflow: hidden;
-    background: #1e1e1e;
-    position: relative;
 }
 
-/* ── Line numbers ─────────────────────────────────────────────── */
-/* We hide the scrollbar but still scroll top-synced to textarea */
-.line-numbers {
-    background: #1e1e1e;
-    color: #858585;
-    padding: 12px 4px 12px 8px;
-    text-align: right;
+/* ── Gutter (line numbers) ─────────────────────────────────────── */
+/* Scrollbar hidden — JS syncs scrollTop to match the editor */
+.editor-gutter {
+    flex-shrink: 0;
+    min-width: 48px;
+    max-width: 48px;
+    overflow: hidden;
+    /* no scrollbar, JS drives scrollTop */
+    background: var(--code-gutter-bg);
+    border-right: 1px solid var(--border);
+    padding: 12px 0;
     font-family: 'JetBrains Mono', monospace;
     font-size: 14px;
     line-height: 1.65;
+    color: var(--code-gutter-text);
+    text-align: right;
     user-select: none;
-    border-right: 1px solid #3c3c3c;
-    overflow: hidden;
-    /* HIDE scrollbar — sync is done via JS */
-    min-width: 52px;
-    max-width: 52px;
-    flex-shrink: 0;
 }
 
-.line-number {
-    height: 1.65em;
-    padding-right: 8px;
+.editor-line-number {
+    height: calc(14px * 1.65);
+    /* matches editor font-size × line-height */
+    padding-right: 10px;
 }
 
-/* ── Editor area ── */
-.editor-input {
+/* ── Scroll area ── */
+/* This is the SINGLE element that actually scrolls.
+   Both the textarea and the PRE live inside here, so
+   they scroll together naturally — no transforms needed. */
+.editor-scroll-area {
     flex: 1;
     min-width: 0;
-    position: relative;
-    overflow: hidden;
+    overflow: auto;
+    /* the real scroll container */
+    background: var(--code-bg);
 }
 
-/* The textarea and the pre MUST share identical dimensions & styles
-   so the transform approach can keep them pixel-perfect. */
+/* ── react-simple-code-editor inner elements ── */
+/* We do NOT override position or transform — let the library handle that.
+   We only control colors, font, and padding. */
+.editor-input {
+    min-width: 100%;
+    min-height: 100%;
+}
+
 .editor-input .npm__react-simple-code-editor__textarea,
 .editor-input .npm__react-simple-code-editor__pre {
     margin: 0 !important;
@@ -56,137 +61,110 @@
     line-height: 1.65 !important;
     tab-size: 4;
     white-space: pre !important;
-    word-break: normal !important;
-    overflow-wrap: normal !important;
-    padding: 12px !important;
 }
 
-/* Textarea: transparent text, handles scroll events */
+/* The textarea is transparent so the highlighted pre shows through */
 .editor-input .npm__react-simple-code-editor__textarea {
-    position: absolute !important;
-    inset: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
-    overflow: auto !important;
-    overflow-y: scroll !important;
     background: transparent !important;
-    caret-color: #aeafad !important;
+    caret-color: var(--code-text) !important;
     color: transparent !important;
     -webkit-text-fill-color: transparent !important;
-    resize: none !important;
-    z-index: 2;
+    outline: none;
 }
 
-/* Pre: the syntax-highlighted layer, scrolled via JS transform */
+/* Highlighted layer — use the theme's code background */
 .editor-input .npm__react-simple-code-editor__pre {
-    position: absolute !important;
-    inset: 0 !important;
-    pointer-events: none !important;
-    overflow: hidden !important;
-    background: #1e1e1e !important;
-    z-index: 1;
-    will-change: transform;
-    /* initial translate is 0; JS will update this on scroll */
-    transform: translate(0, 0);
+    background: var(--code-bg) !important;
+    color: var(--code-text) !important;
 }
 
-/* React-simple-code-editor uses a wrapper div with the same styles
-   — make sure it fills the full height */
-.editor-input>div {
-    position: relative;
-    height: 100%;
-}
+/* ═══════════════════════════════════════════════════════════════
+   VS Code Dark+ token colours (shared by editor + CodeBlock view)
+   ═══════════════════════════════════════════════════════════════ */
 
-/* ── VS Code Dark+ accurate token colors ── */
-
-/* Default code text */
-.editor-input .npm__react-simple-code-editor__pre,
-.code-wrapper pre[class*='language-'] {
-    color: #d4d4d4 !important;
-}
-
-/* Comments — green-grey */
+/* Comments */
 .editor-input .token.comment,
 .editor-input .token.prolog,
 .editor-input .token.doctype,
 .editor-input .token.cdata,
-.code-wrapper .token.comment {
-    color: #6a9955 !important;
+.code-wrapper .token.comment,
+.code-wrapper .token.prolog {
+    color: var(--code-comment) !important;
     font-style: italic;
 }
 
-/* Keywords — purple/blue */
+/* Keywords: const, let, var, if, else, return, etc. */
 .editor-input .token.keyword,
+.editor-input .token.module,
 .code-wrapper .token.keyword {
-    color: #569cd6 !important;
+    color: var(--code-keyword) !important;
     font-weight: 500;
 }
 
-/* Control flow: if, else, return, etc — magenta-ish */
+/* Control-flow keywords */
 .editor-input .token.control,
-.editor-input .token.module,
 .editor-input .token.important,
 .code-wrapper .token.control {
     color: #c586c0 !important;
 }
 
-/* Strings — orange-brown */
+/* Strings */
 .editor-input .token.string,
 .editor-input .token.char,
-.editor-input .token.attr-value,
-.code-wrapper .token.string,
-.code-wrapper .token.attr-value {
-    color: #ce9178 !important;
-}
-
-/* Template literals / template expressions */
 .editor-input .token.template-string,
-.code-wrapper .token.template-string {
-    color: #ce9178 !important;
+.code-wrapper .token.string,
+.code-wrapper .token.char {
+    color: var(--code-string) !important;
 }
 
-/* Numbers — green */
+/* Numbers, booleans, null */
 .editor-input .token.number,
 .editor-input .token.boolean,
+.editor-input .token.null,
 .code-wrapper .token.number,
 .code-wrapper .token.boolean {
-    color: #b5cea8 !important;
+    color: var(--code-number) !important;
 }
 
-/* Functions — yellow */
+/* Function names */
 .editor-input .token.function,
 .code-wrapper .token.function {
-    color: #dcdcaa !important;
+    color: var(--code-function) !important;
 }
 
-/* Class names, types — teal/cyan */
+/* Class names, types, builtins */
 .editor-input .token.class-name,
 .editor-input .token.builtin,
-.editor-input .token.type-annotation,
 .code-wrapper .token.class-name,
 .code-wrapper .token.builtin {
-    color: #4ec9b0 !important;
+    color: var(--code-type) !important;
 }
 
-/* HTML/JSX tags — blue */
+/* HTML/JSX tags */
 .editor-input .token.tag,
 .code-wrapper .token.tag {
-    color: #569cd6 !important;
+    color: var(--code-keyword) !important;
 }
 
-/* HTML attr-name — light blue */
+/* HTML attribute names */
 .editor-input .token.attr-name,
 .code-wrapper .token.attr-name {
     color: #9cdcfe !important;
 }
 
-/* CSS selectors — yellow */
+/* HTML attribute values */
+.editor-input .token.attr-value,
+.code-wrapper .token.attr-value {
+    color: var(--code-string) !important;
+}
+
+/* CSS selectors */
 .editor-input .token.selector,
 .code-wrapper .token.selector {
     color: #d7ba7d !important;
 }
 
-/* CSS properties — light blue */
+/* CSS/JSON properties */
 .editor-input .token.property,
 .code-wrapper .token.property {
     color: #9cdcfe !important;
@@ -197,7 +175,7 @@
 .editor-input .token.punctuation,
 .code-wrapper .token.operator,
 .code-wrapper .token.punctuation {
-    color: #d4d4d4 !important;
+    color: var(--code-punctuation) !important;
 }
 
 /* Constants, symbols, variables */
@@ -209,34 +187,37 @@
     color: #4fc1ff !important;
 }
 
-/* Regex */
+/* Regex patterns */
 .editor-input .token.regex,
 .code-wrapper .token.regex {
     color: #d16969 !important;
 }
 
-/* Namespaces, imports */
+/* Namespace */
 .editor-input .token.namespace,
 .code-wrapper .token.namespace {
-    color: #4ec9b0 !important;
+    color: var(--code-type) !important;
 }
 
-
-/* ── Mobile responsive ── */
+/* ───── Mobile ───── */
 @media (max-width: 768px) {
-    .editor-container {
+    .code-editor {
         height: 240px;
+    }
+
+    .editor-gutter {
+        min-width: 38px;
+        max-width: 38px;
+        font-size: 12px;
+    }
+
+    .editor-line-number {
+        height: calc(12px * 1.65);
+        padding-right: 6px;
     }
 
     .editor-input .npm__react-simple-code-editor__textarea,
     .editor-input .npm__react-simple-code-editor__pre {
         font-size: 12px !important;
-    }
-
-    .line-numbers {
-        min-width: 40px;
-        max-width: 40px;
-        font-size: 12px;
-        padding: 8px 4px 8px 6px;
     }
 }
