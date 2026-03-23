@@ -5,11 +5,10 @@ SnipShare is a lightning-fast, open-source code sharing platform built on the ME
 ## Features
 
 - **Instant Code Sharing:** Paste any text or code and generate a secure 6-digit shortcode URL.
-- **Dynamic Syntax Highlighting:** Supports over 20+ programming languages automatically parsed via Prism.js.
 - **Self-Destructing Pastes:** Set snippets to automatically expire after 1 hour, 1 day, or 1 week using Native MongoDB TTL indexes.
 - **Secure Authentication:** JWT-based user accounts allow you to track your snippets, view history, and manually delete active codes.
 - **Analytics Dashboard:** Monitor total global clip views and manage your expiration queues directly from a personalized dashboard.
-- **Modern SpotLink Aesthetic:** A premium, fully responsive dark mode UI featuring deep obsidian backgrounds (`#0A0A0A`) and vivid Amber accents (`#F59E0B`). 
+- **Modern & Aesthetic Theme:** A premium, fully responsive dark mode UI featuring deep obsidian backgrounds (`#0A0A0A`) and vivid Amber accents (`#F59E0B`). 
 - **SEO Optimized:** Dynamically rendered `<title>` and metadata injections across all routes for maximum search indexing.
 - **Mobile Responsive:** Flex layouts operate perfectly on desktop, tablet, and mobile browsers.
 
