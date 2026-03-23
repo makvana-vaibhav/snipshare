@@ -48,7 +48,7 @@ const detectLanguage = (content) => {
         css: /(?:@media|@keyframes|{[\s\S]*?:[\s\S]*?;})/,
         json: /^\s*{[\s\S]*}\s*$|^\s*\[[\s\S]*\]\s*$/,
         sql: /(?:SELECT|INSERT|UPDATE|DELETE|FROM|WHERE)\s/i,
-        bash: /#!/bin/bash|^export |^alias /m,
+        bash: /#!\/bin\/bash|^export |^alias /m,
         php: /<\?php|echo |function /,
     };
 

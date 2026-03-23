@@ -1,5 +1,3 @@
-const sanitizeHtml = require('sanitize-html');
-
 // Sanitize user input to prevent XSS
 const sanitizeInput = (input) => {
     if (typeof input !== 'string') return input;

@@ -136,10 +136,4 @@
     .password-form button {
         min-width: 100%;
     }
-}        justify-content: space-between;
-        background: var(--bg-3);
-        padding: 0.85rem;
-        border-radius: var(--radius-sm);
-        border: 1px solid var(--border);
-    }
 }
