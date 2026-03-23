@@ -6,7 +6,9 @@
     display: flex;
     border: 1px solid var(--border);
     border-radius: var(--radius-sm);
-    overflow: hidden;
+    /* Allow wrapper to scroll vertically for the whole editor */
+    overflow-y: auto;
+    overflow-x: hidden;
     background: var(--code-bg);
     min-height: 280px;
     max-height: 55vh;
@@ -17,8 +19,7 @@
 .ce-gutter {
     flex-shrink: 0;
     width: 48px;
-    overflow: hidden;
-    /* no scrollbar; grows with content */
+    /* Gutter height expands to match content, no internal scroll */
     background: var(--code-gutter-bg);
     border-right: 1px solid var(--border);
     padding: 12px 0;
@@ -40,9 +41,10 @@
 .ce-body {
     flex: 1;
     min-width: 0;
-    overflow: auto;
+    /* Only scroll horizontally internally */
+    overflow-x: auto;
+    overflow-y: hidden;
     background: var(--code-bg);
-    /* Make sure both children grow to fill ce-body height */
     display: flex;
     flex-direction: column;
 }
