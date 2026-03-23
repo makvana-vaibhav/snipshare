@@ -22,6 +22,14 @@ const userSchema = new mongoose.Schema({
         required: [true, 'Password is required'],
         minlength: 6,
     },
+    refreshToken: {
+        type: String,
+        default: null,
+    },
+    rememberMe: {
+        type: Boolean,
+        default: false,
+    },
     createdAt: {
         type: Date,
         default: Date.now,

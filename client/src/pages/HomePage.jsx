@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import api from '../api/axiosInstance';
+import CodeEditor from '../components/CodeEditor';
 import './HomePage.css';
 
 const LANGUAGES = [
@@ -35,6 +36,29 @@ const EXPIRY_OPTIONS = [
     { value: '1week', label: '1 Week' },
 ];
 
+// Language detection based on content patterns
+const detectLanguage = (content) => {
+    if (!content) return 'plaintext';
+
+    const patterns = {
+        javascript: /(?:const|let|var|function|=>|console\.log|import|export)/,
+        python: /(?:def |import |class |print\(|if __name__|:$)/m,
+        java: /(?:public class |import java|void main|new |String\[\])/,
+        html: /<!DOCTYPE|<html>|<head>|<body>/i,
+        css: /(?:@media|@keyframes|{[\s\S]*?:[\s\S]*?;})/,
+        json: /^\s*{[\s\S]*}\s*$|^\s*\[[\s\S]*\]\s*$/,
+        sql: /(?:SELECT|INSERT|UPDATE|DELETE|FROM|WHERE)\s/i,
+        bash: /#!/bin/bash|^export |^alias /m,
+        php: /<\?php|echo |function /,
+    };
+
+    for (const [lang, pattern] of Object.entries(patterns)) {
+        if (pattern.test(content)) return lang;
+    }
+
+    return 'plaintext';
+};
+
 export default function HomePage() {
     const navigate = useNavigate();
     const [form, setForm] = useState({
@@ -42,12 +66,30 @@ export default function HomePage() {
         content: '',
         language: 'plaintext',
         expiry: 'never',
+        isPublic: false,
+        password: '',
+        selfDestruct: false,
     });
     const [loading, setLoading] = useState(false);
     const [pasteCode, setPasteCode] = useState('');
+    const [showAdvanced, setShowAdvanced] = useState(false);
 
     const handleChange = (e) => {
-        setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+        const { name, value, type, checked } = e.target;
+        setForm((prev) => ({
+            ...prev,
+            [name]: type === 'checkbox' ? checked : value,
+        }));
+    };
+
+    const handleContentChange = (e) => {
+        const content = e.target.value;
+        const detected = detectLanguage(content);
+        setForm((prev) => ({
+            ...prev,
+            content,
+            language: detected !== 'plaintext' ? detected : prev.language,
+        }));
     };
 
     const handleSubmit = async (e) => {
@@ -99,12 +141,12 @@ export default function HomePage() {
                 <div className="card">
                     <form onSubmit={handleSubmit}>
                         <div className="form-group">
-                            <label htmlFor="title">Title</label>
+                            <label htmlFor="title">Title (optional)</label>
                             <input
                                 id="title"
                                 name="title"
                                 type="text"
-                                placeholder="My awesome snippet (optional)"
+                                placeholder="Give your snippet a title..."
                                 value={form.title}
                                 onChange={handleChange}
                                 maxLength={200}
@@ -132,16 +174,59 @@ export default function HomePage() {
 
                         <div className="form-group">
                             <label htmlFor="content">Content <span className="text-danger">*</span></label>
-                            <textarea
-                                id="content"
-                                name="content"
-                                placeholder="Paste your code or text here..."
+                            <CodeEditor
                                 value={form.content}
-                                onChange={handleChange}
-                                required
-                                rows={14}
+                                onChange={handleContentChange}
+                                language={form.language}
                             />
                         </div>
+
+                        <button
+                            type="button"
+                            className="btn btn-link"
+                            onClick={() => setShowAdvanced(!showAdvanced)}
+                        >
+                            {showAdvanced ? '▼ Advanced Options' : '▶ Advanced Options'}
+                        </button>
+
+                        {showAdvanced && (
+                            <div className="advanced-options">
+                                <div className="form-group">
+                                    <label>
+                                        <input
+                                            type="checkbox"
+                                            name="isPublic"
+                                            checked={form.isPublic}
+                                            onChange={handleChange}
+                                        />
+                                        Make Public (shareable)
+                                    </label>
+                                </div>
+                                <div className="form-group">
+                                    <label>
+                                        <input
+                                            type="checkbox"
+                                            name="selfDestruct"
+                                            checked={form.selfDestruct}
+                                            onChange={handleChange}
+                                        />
+                                        Self-destruct after first view
+                                    </label>
+                                </div>
+                                <div className="form-group">
+                                    <label htmlFor="password">Password Protect (optional)</label>
+                                    <input
+                                        id="password"
+                                        name="password"
+                                        type="password"
+                                        placeholder="Leave blank for no password"
+                                        value={form.password}
+                                        onChange={handleChange}
+                                        maxLength={50}
+                                    />
+                                </div>
+                            </div>
+                        )}
 
                         <div className="form-actions">
                             <span className="text-xs text-muted">

@@ -2,12 +2,16 @@ const express = require('express');
 const { validationResult } = require('express-validator');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const { protect } = require('../middleware/auth');
 const { validateSignup, validateLogin } = require('../middleware/validate');
 
 const router = express.Router();
 
-const generateToken = (id) =>
-    jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '7d' });
+const generateAccessToken = (id) =>
+    jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '1d' });
+
+const generateRefreshToken = (id) =>
+    jwt.sign({ id }, process.env.JWT_REFRESH_SECRET || process.env.JWT_SECRET, { expiresIn: '7d' });
 
 // POST /api/auth/signup
 router.post('/signup', validateSignup, async (req, res, next) => {
@@ -17,19 +21,28 @@ router.post('/signup', validateSignup, async (req, res, next) => {
     }
 
     try {
-        const { username, email, password } = req.body;
+        const { username, email, password, rememberMe } = req.body;
         const existing = await User.findOne({ $or: [{ email }, { username }] });
         if (existing) {
             return res.status(409).json({
                 message: existing.email === email ? 'Email already in use' : 'Username already taken',
             });
         }
-        const user = await User.create({ username, email, password });
+        const user = await User.create({ username, email, password, rememberMe: rememberMe || false });
+        
+        const accessToken = generateAccessToken(user._id);
+        const refreshToken = generateRefreshToken(user._id);
+        
+        user.refreshToken = refreshToken;
+        await user.save();
+
         res.status(201).json({
             _id: user._id,
             username: user.username,
             email: user.email,
-            token: generateToken(user._id),
+            accessToken,
+            refreshToken,
+            rememberMe: user.rememberMe,
         });
     } catch (err) {
         next(err);
@@ -44,32 +57,72 @@ router.post('/login', validateLogin, async (req, res, next) => {
     }
 
     try {
-        const { email, password } = req.body;
+        const { email, password, rememberMe } = req.body;
         const user = await User.findOne({ email });
         if (!user || !(await user.matchPassword(password))) {
             return res.status(401).json({ message: 'Invalid email or password' });
         }
+
+        const accessToken = generateAccessToken(user._id);
+        const refreshToken = generateRefreshToken(user._id);
+        
+        user.refreshToken = refreshToken;
+        user.rememberMe = rememberMe || false;
+        await user.save();
+
         res.json({
             _id: user._id,
             username: user.username,
             email: user.email,
-            token: generateToken(user._id),
+            accessToken,
+            refreshToken,
+            rememberMe: user.rememberMe,
         });
     } catch (err) {
         next(err);
     }
 });
 
-// GET /api/auth/me
-router.get('/me', async (req, res, next) => {
+// POST /api/auth/refresh — refresh access token
+router.post('/refresh', async (req, res, next) => {
     try {
-        let token;
-        if (req.headers.authorization?.startsWith('Bearer ')) {
-            token = req.headers.authorization.split(' ')[1];
+        const { refreshToken } = req.body;
+        if (!refreshToken) {
+            return res.status(401).json({ message: 'Refresh token required' });
         }
-        if (!token) return res.status(401).json({ message: 'No token' });
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const user = await User.findById(decoded.id).select('-password');
+
+        const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET || process.env.JWT_SECRET);
+        const user = await User.findById(decoded.id);
+
+        if (!user || user.refreshToken !== refreshToken) {
+            return res.status(401).json({ message: 'Invalid refresh token' });
+        }
+
+        const newAccessToken = generateAccessToken(user._id);
+        res.json({ accessToken: newAccessToken });
+    } catch (err) {
+        res.status(401).json({ message: 'Token validation failed' });
+    }
+});
+
+// POST /api/auth/logout
+router.post('/logout', protect, async (req, res, next) => {
+    try {
+        const user = await User.findById(req.user._id);
+        if (user) {
+            user.refreshToken = null;
+            await user.save();
+        }
+        res.json({ message: 'Logged out successfully' });
+    } catch (err) {
+        next(err);
+    }
+});
+
+// GET /api/auth/me
+router.get('/me', protect, async (req, res, next) => {
+    try {
+        const user = await User.findById(req.user._id).select('-password');
         if (!user) return res.status(404).json({ message: 'User not found' });
         res.json(user);
     } catch (err) {

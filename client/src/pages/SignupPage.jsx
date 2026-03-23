@@ -8,18 +8,23 @@ import './AuthPage.css';
 export default function SignupPage() {
     const { login } = useAuth();
     const navigate = useNavigate();
-    const [form, setForm] = useState({ username: '', email: '', password: '' });
+    const [form, setForm] = useState({ username: '', email: '', password: '', rememberMe: true });
     const [loading, setLoading] = useState(false);
 
-    const handleChange = (e) =>
-        setForm((p) => ({ ...p, [e.target.name]: e.target.value }));
+    const handleChange = (e) => {
+        const { name, type, checked, value } = e.target;
+        setForm((p) => ({
+            ...p,
+            [name]: type === 'checkbox' ? checked : value,
+        }));
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
         try {
             const res = await api.post('/auth/signup', form);
-            login(res.data, res.data.token);
+            login(res.data, res.data.accessToken, res.data.refreshToken, form.rememberMe);
             toast.success(`Account created! Welcome, ${res.data.username}!`);
             navigate('/dashboard');
         } catch (err) {
@@ -63,6 +68,17 @@ export default function SignupPage() {
                                 value={form.password} onChange={handleChange}
                                 minLength={6} required
                             />
+                        </div>
+                        <div className="form-group">
+                            <label>
+                                <input
+                                    name="rememberMe"
+                                    type="checkbox"
+                                    checked={form.rememberMe}
+                                    onChange={handleChange}
+                                />
+                                Remember me for 7 days
+                            </label>
                         </div>
                         <button type="submit" className="btn btn-primary btn-full" disabled={loading}>
                             {loading ? 'Creating account…' : 'Create Account'}

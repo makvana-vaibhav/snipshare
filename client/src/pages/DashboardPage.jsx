@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import api from '../api/axiosInstance';
 import { useAuth } from '../context/AuthContext';
+import CopyButton from '../components/CopyButton';
 import './DashboardPage.css';
 
 function timeAgo(iso) {
@@ -16,7 +17,8 @@ function timeAgo(iso) {
 }
 
 export default function DashboardPage() {
-    const { user } = useAuth();
+    const { user, logout } = useAuth();
+    const navigate = useNavigate();
     const [pastes, setPastes] = useState([]);
     const [loading, setLoading] = useState(true);
     const [deletingId, setDeletingId] = useState(null);
@@ -42,6 +44,19 @@ export default function DashboardPage() {
         }
     };
 
+    const handleLogout = async () => {
+        try {
+            await api.post('/auth/logout');
+        } catch (err) {
+            console.error('Logout error:', err);
+        }
+        logout();
+        toast.success('Logged out');
+        navigate('/');
+    };
+
+    const totalViews = pastes.reduce((sum, p) => sum + (p.viewCount || 0), 0);
+
     return (
         <div className="page fade-in">
             <div className="container">
@@ -50,7 +65,26 @@ export default function DashboardPage() {
                         <h1>Dashboard</h1>
                         <p className="text-muted text-sm">Welcome, <strong>{user?.username}</strong></p>
                     </div>
-                    <Link to="/" className="btn btn-primary">+ New Paste</Link>
+                    <div className="dash-header-actions">
+                        <Link to="/" className="btn btn-primary">+ New Paste</Link>
+                        <button onClick={handleLogout} className="btn btn-secondary">Logout</button>
+                    </div>
+                </div>
+
+                {/* Stats */}
+                <div className="stats-grid">
+                    <div className="stat-card">
+                        <div className="stat-value">{pastes.length}</div>
+                        <div className="stat-label">Total Pastes</div>
+                    </div>
+                    <div className="stat-card">
+                        <div className="stat-value">{totalViews}</div>
+                        <div className="stat-label">Total Views</div>
+                    </div>
+                    <div className="stat-card">
+                        <div className="stat-value">{pastes.filter(p => p.expiresAt).length}</div>
+                        <div className="stat-label">Expiring</div>
+                    </div>
                 </div>
 
                 {loading ? (
@@ -73,17 +107,29 @@ export default function DashboardPage() {
                                         <Link to={`/paste/${p.slug}`} className="paste-item-title">
                                             {p.title || 'Untitled'}
                                         </Link>
-                                        <div className="flex gap-1 items-center">
+                                        <div className="flex gap-1 items-center flex-wrap">
                                             <span className="badge">{p.language}</span>
                                             <span className="text-muted text-xs">{timeAgo(p.createdAt)}</span>
+                                            {p.viewCount > 0 && (
+                                                <span className="text-xs">👁 {p.viewCount}</span>
+                                            )}
                                             {p.expiresAt && (
                                                 <span className="text-xs" style={{ color: 'var(--warning)' }}>
                                                     ⏱ expires
                                                 </span>
                                             )}
+                                            {p.isPublic && (
+                                                <span className="text-xs" style={{ color: 'var(--accent)' }}>
+                                                    🌐 public
+                                                </span>
+                                            )}
                                         </div>
                                     </div>
                                     <div className="paste-item-actions">
+                                        <CopyButton
+                                            text={`${window.location.origin}/paste/${p.slug}`}
+                                            label="Link"
+                                        />
                                         <Link
                                             to={`/paste/${p.slug}`}
                                             className="btn btn-secondary btn-sm"
@@ -98,6 +144,15 @@ export default function DashboardPage() {
                                             {deletingId === p.slug ? '…' : 'Delete'}
                                         </button>
                                     </div>
+                                </div>
+                            ))}
+                        </div>
+                    </>
+                )}
+            </div>
+        </div>
+    );
+}
                                 </div>
                             ))}
                         </div>

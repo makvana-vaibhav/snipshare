@@ -6,6 +6,9 @@ const connectDB = require('./config/db');
 const pasteRoutes = require('./routes/pasteRoutes');
 const authRoutes = require('./routes/authRoutes');
 const errorHandler = require('./middleware/errorHandler');
+const { requestLogger, errorLogger } = require('./middleware/logging');
+const { sanitizationMiddleware } = require('./middleware/sanitization');
+const cronJobs = require('./middleware/cronJobs');
 
 const app = express();
 
@@ -14,6 +17,9 @@ app.set('trust proxy', 1);
 
 // Connect to MongoDB
 connectDB();
+
+// Start cron jobs
+cronJobs();
 
 app.get('/', (req, res) => res.send('SnipShare API is running! 🚀'));
 
@@ -26,15 +32,29 @@ app.use(cors({
 // Body parser
 app.use(express.json({ limit: '2mb' }));
 
-// Rate limiting
-const limiter = rateLimit({
+// Request logging
+app.use(requestLogger);
+
+// Input sanitization
+app.use(sanitizationMiddleware);
+
+// Rate limiting (stricter on paste creation)
+const generalLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
     max: 100,
     message: { message: 'Too many requests, please try again later.' },
 });
-app.use('/api', limiter);
+
+const createPasteLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 30,
+    message: { message: 'Too many pastes created, please try again later.' },
+});
+
+app.use('/api', generalLimiter);
 
 // Routes
+app.post('/api/paste', createPasteLimiter, pasteRoutes);
 app.use('/api/paste', pasteRoutes);
 app.use('/api/auth', authRoutes);
 
@@ -45,7 +65,10 @@ app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
 app.use((req, res) => res.status(404).json({ message: 'Route not found' }));
 
 // Error handler
-app.use(errorHandler);
+app.use((err, req, res, next) => {
+    errorLogger(err);
+    errorHandler(err, req, res, next);
+});
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

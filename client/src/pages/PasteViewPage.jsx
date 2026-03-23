@@ -33,18 +33,55 @@ export default function PasteViewPage() {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(true);
     const [deleting, setDeleting] = useState(false);
+    const [password, setPassword] = useState('');
+    const [passwordRequired, setPasswordRequired] = useState(false);
+    const [submittingPassword, setSubmittingPassword] = useState(false);
 
     useEffect(() => {
-        api.get(`/paste/${id}`)
-            .then((res) => setPaste(res.data))
-            .catch((err) => {
-                const status = err.response?.status;
-                if (status === 410) setError('This paste has expired.');
-                else if (status === 404) setError('Paste not found.');
-                else setError('Failed to load paste.');
-            })
-            .finally(() => setLoading(false));
+        fetchPaste();
     }, [id]);
+
+    const fetchPaste = async () => {
+        try {
+            const params = password ? { password } : {};
+            const res = await api.get(`/paste/${id}`, { params });
+            setPaste(res.data);
+            setPasswordRequired(false);
+        } catch (err) {
+            const status = err.response?.status;
+            if (status === 401) {
+                setPasswordRequired(true);
+                setError('This paste is password protected.');
+            } else if (status === 410) {
+                setError('This paste has expired.');
+            } else if (status === 404) {
+                setError('Paste not found.');
+            } else {
+                setError('Failed to load paste.');
+            }
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handlePasswordSubmit = async (e) => {
+        e.preventDefault();
+        if (!password) {
+            toast.error('Please enter a password');
+            return;
+        }
+        setSubmittingPassword(true);
+        try {
+            const res = await api.get(`/paste/${id}`, { params: { password } });
+            setPaste(res.data);
+            setPasswordRequired(false);
+            toast.success('Access granted');
+        } catch (err) {
+            toast.error('Incorrect password');
+        } finally {
+            setSubmittingPassword(false);
+        }
+    };
 
     const handleDelete = async () => {
         if (!window.confirm('Delete this paste?')) return;
@@ -59,9 +96,38 @@ export default function PasteViewPage() {
         }
     };
 
+    const handleEdit = () => {
+        navigate(`/paste/${id}/edit`);
+    };
+
     const pasteUrl = window.location.href;
 
     if (loading) return <div className="spinner" style={{ marginTop: '6rem' }} />;
+
+    if (passwordRequired) {
+        return (
+            <div className="page fade-in">
+                <div className="container">
+                    <div className="password-gate card text-center">
+                        <div className="password-icon">🔒</div>
+                        <h2>{error}</h2>
+                        <form onSubmit={handlePasswordSubmit} className="password-form">
+                            <input
+                                type="password"
+                                placeholder="Enter password..."
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                autoFocus
+                            />
+                            <button type="submit" className="btn btn-primary" disabled={submittingPassword}>
+                                {submittingPassword ? 'Verifying…' : 'Unlock'}
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     if (error) {
         return (
@@ -78,7 +144,7 @@ export default function PasteViewPage() {
         );
     }
 
-    const isOwner = user && paste.userId && paste.userId === (user._id || user.id);
+    const isOwner = user && paste?.userId && paste.userId === (user._id || user.id);
 
     return (
         <div className="page fade-in">
@@ -90,6 +156,12 @@ export default function PasteViewPage() {
                             <h1 className="paste-title">{paste.title || 'Untitled'}</h1>
                             <div className="paste-meta flex gap-1 items-center">
                                 <span className="badge">{paste.language}</span>
+                                {paste.viewCount > 0 && (
+                                    <>
+                                        <span className="text-muted text-sm">·</span>
+                                        <span className="text-muted text-sm">👁 {paste.viewCount}</span>
+                                    </>
+                                )}
                                 <span className="text-muted text-sm">·</span>
                                 <span className="text-muted text-sm">{formatDate(paste.createdAt)}</span>
                                 {paste.expiresAt && (
@@ -98,6 +170,12 @@ export default function PasteViewPage() {
                                         <span className="text-sm expiry-badge">
                                             ⏱ {formatExpiry(paste.expiresAt)}
                                         </span>
+                                    </>
+                                )}
+                                {paste.selfDestruct && (
+                                    <>
+                                        <span className="text-muted text-sm">·</span>
+                                        <span className="text-sm expiry-badge">💥 Auto-destruct</span>
                                     </>
                                 )}
                             </div>
@@ -110,13 +188,21 @@ export default function PasteViewPage() {
                             <CopyButton text={pasteUrl} label="Link" />
                             <CopyButton text={paste.content} label="Content" />
                             {isOwner && (
-                                <button
-                                    onClick={handleDelete}
-                                    disabled={deleting}
-                                    className="btn btn-danger btn-sm"
-                                >
-                                    {deleting ? 'Deleting…' : 'Delete'}
-                                </button>
+                                <>
+                                    <button
+                                        onClick={handleEdit}
+                                        className="btn btn-secondary btn-sm"
+                                    >
+                                        Edit
+                                    </button>
+                                    <button
+                                        onClick={handleDelete}
+                                        disabled={deleting}
+                                        className="btn btn-danger btn-sm"
+                                    >
+                                        {deleting ? 'Deleting…' : 'Delete'}
+                                    </button>
+                                </>
                             )}
                         </div>
                     </div>

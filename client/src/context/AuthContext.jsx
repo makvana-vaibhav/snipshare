@@ -9,12 +9,29 @@ export const AuthProvider = ({ children }) => {
 
     useEffect(() => {
         const token = localStorage.getItem('snipshare_token');
+        const refreshToken = localStorage.getItem('snipshare_refresh_token');
+        
         if (token) {
             api.get('/auth/me')
                 .then((res) => setUser(res.data))
-                .catch(() => {
-                    localStorage.removeItem('snipshare_token');
-                    setUser(null);
+                .catch(async (err) => {
+                    if (err.response?.status === 401 && refreshToken) {
+                        try {
+                            const res = await api.post('/auth/refresh', { refreshToken });
+                            localStorage.setItem('snipshare_token', res.data.accessToken);
+                            api.defaults.headers.Authorization = `Bearer ${res.data.accessToken}`;
+                            const userRes = await api.get('/auth/me');
+                            setUser(userRes.data);
+                        } catch {
+                            localStorage.removeItem('snipshare_token');
+                            localStorage.removeItem('snipshare_refresh_token');
+                            setUser(null);
+                        }
+                    } else {
+                        localStorage.removeItem('snipshare_token');
+                        localStorage.removeItem('snipshare_refresh_token');
+                        setUser(null);
+                    }
                 })
                 .finally(() => setLoading(false));
         } else {
@@ -22,13 +39,21 @@ export const AuthProvider = ({ children }) => {
         }
     }, []);
 
-    const login = (userData, token) => {
+    const login = (userData, token, refreshToken, rememberMe) => {
         localStorage.setItem('snipshare_token', token);
+        localStorage.setItem('snipshare_refresh_token', refreshToken || '');
+        if (rememberMe) {
+            localStorage.setItem('snipshare_rememberMe', 'true');
+        }
+        api.defaults.headers.Authorization = `Bearer ${token}`;
         setUser(userData);
     };
 
     const logout = () => {
         localStorage.removeItem('snipshare_token');
+        localStorage.removeItem('snipshare_refresh_token');
+        localStorage.removeItem('snipshare_rememberMe');
+        delete api.defaults.headers.Authorization;
         setUser(null);
     };
 

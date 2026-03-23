@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const { customAlphabet } = require('nanoid');
+const bcrypt = require('bcryptjs');
 const generateCode = customAlphabet('0123456789', 6);
 
 const pasteSchema = new mongoose.Schema({
@@ -42,6 +43,35 @@ const pasteSchema = new mongoose.Schema({
         ref: 'User',
         default: null,
     },
+    isPublic: {
+        type: Boolean,
+        default: false,
+    },
+    viewCount: {
+        type: Number,
+        default: 0,
+    },
+    passwordHash: {
+        type: String,
+        default: null,
+    },
+    selfDestruct: {
+        type: Boolean,
+        default: false,
+    },
 });
+
+// Hash password before saving if modified
+pasteSchema.pre('save', async function () {
+    if (!this.isModified('passwordHash') || !this.passwordHash) return;
+    const salt = await bcrypt.genSalt(10);
+    this.passwordHash = await bcrypt.hash(this.passwordHash, salt);
+});
+
+// Compare password helper
+pasteSchema.methods.matchPassword = async function (enteredPassword) {
+    if (!this.passwordHash) return false;
+    return bcrypt.compare(enteredPassword, this.passwordHash);
+};
 
 module.exports = mongoose.model('Paste', pasteSchema);
