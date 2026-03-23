@@ -58,6 +58,3 @@ Deploy the `server` directory as a Node Web Service on Render. Make sure the `St
 **Frontend (Netlify):**
 Point Netlify to the `client` directory. Netlify inherently understands the Vite build step, uses `client/public/_redirects` for React Router DOM integration, and discovers the remote Production backend dynamically.
 
-## License
-
-MIT License. Free to use, fork, and modify.
