@@ -9,6 +9,9 @@ const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
 
+// Trust reverse proxy (for Render / Heroku / Netlify)
+app.set('trust proxy', 1);
+
 // Connect to MongoDB
 connectDB();
 
