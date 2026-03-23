@@ -2,24 +2,24 @@
 
 /* ── Design tokens ── */
 :root {
-  --bg: #09090b;
-  --bg-2: #121216;
-  --bg-3: #18181b;
-  --surface: rgba(24, 24, 27, 0.65);
-  --surface-2: #27272a;
-  --border: rgba(255, 255, 255, 0.08);
-  --border-focus: #8b5cf6;
+  --bg: #0F1E2A;
+  --bg-2: #1B3C53;
+  --bg-3: #234C6A;
+  --surface: #1B3C53;
+  --surface-2: #234C6A;
+  --border: #456882;
+  --border-focus: #F59E0B;
 
-  --accent: #3b82f6;
-  --accent-hover: #2563eb;
-  --accent-2: #06b6d4;
+  --accent: #F59E0B;
+  --accent-hover: #D97706;
+  --accent-2: #F59E0B;
   --success: #10b981;
   --danger: #ef4444;
   --warning: #f59e0b;
 
-  --text: #e8eaf0;
-  --text-2: #9ba3c0;
-  --text-3: #606882;
+  --text: #ffffff;
+  --text-2: #D2C1B6;
+  --text-3: #456882;
 
   --radius: 10px;
   --radius-sm: 6px;
@@ -29,14 +29,14 @@
 
   --transition: 0.18s ease;
 
-  --navbar-bg: rgba(9, 9, 11, 0.85);
-  --input-bg: rgba(24, 24, 27, 0.8);
-  --input-bg-focus: rgba(39, 39, 42, 0.9);
+  --navbar-bg: rgba(15, 30, 42, 0.95);
+  --input-bg: #0F1E2A;
+  --input-bg-focus: #1B3C53;
   --input-border: var(--border);
-  --select-option-bg: #18181b;
-  --code-bg: #11131a;
-  --code-gutter-bg: #0d1016;
-  --code-gutter-text: #65708a;
+  --select-option-bg: #1B3C53;
+  --code-bg: #0F1E2A;
+  --code-gutter-bg: #1B3C53;
+  --code-gutter-text: #456882;
   --code-text: #d4d4d4;
   --code-comment: #6a9955;
   --code-keyword: #569cd6;
