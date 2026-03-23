@@ -65,10 +65,6 @@ export default function DashboardPage() {
                         <h1>Dashboard</h1>
                         <p className="text-muted text-sm">Welcome, <strong>{user?.username}</strong></p>
                     </div>
-                    <div className="dash-header-actions">
-                        <Link to="/" className="btn btn-primary">+ New Snippet</Link>
-                        <button onClick={handleLogout} className="btn btn-secondary">Logout</button>
-                    </div>
                 </div>
 
                 {/* Stats */}

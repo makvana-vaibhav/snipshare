@@ -10,8 +10,8 @@
   --border: rgba(255, 255, 255, 0.08);
   --border-focus: #8b5cf6;
 
-  --accent: #8b5cf6;
-  --accent-hover: #7c3aed;
+  --accent: #3b82f6;
+  --accent-hover: #2563eb;
   --accent-2: #06b6d4;
   --success: #10b981;
   --danger: #ef4444;
@@ -54,7 +54,7 @@
   --surface: rgba(255, 255, 255, 0.9);
   --surface-2: #eef2fb;
   --border: rgba(15, 23, 42, 0.12);
-  --border-focus: #7c3aed;
+  --border-focus: #2563eb;
 
   --text: #111827;
   --text-2: #475569;
@@ -70,7 +70,7 @@
   --code-gutter-text: #94a3b8;
   --code-text: #1f2937;
   --code-comment: #6b7280;
-  --code-keyword: #7c3aed;
+  --code-keyword: #2563eb;
   --code-string: #b45309;
   --code-number: #059669;
   --code-function: #0369a1;
@@ -187,7 +187,7 @@ select:focus,
 textarea:focus {
   border-color: var(--border-focus);
   background: var(--input-bg-focus);
-  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
 }
 
 textarea {
@@ -229,15 +229,14 @@ select option {
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+  background: var(--accent);
   color: #fff;
-  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .btn-primary:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(139, 92, 246, 0.5);
+  transform: translateY(-1px);
+  background: var(--accent-hover);
 }
 
 .btn-secondary {

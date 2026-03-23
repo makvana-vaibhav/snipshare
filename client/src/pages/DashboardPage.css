@@ -25,7 +25,7 @@
 }
 
 .stat-card {
-    background: linear-gradient(135deg, var(--accent-2), var(--accent));
+    background: var(--accent);
     color: white;
     padding: 1.25rem;
     border-radius: 8px;
