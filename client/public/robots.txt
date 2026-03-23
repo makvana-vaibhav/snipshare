@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard
+Disallow: /paste/*/edit
+
+Sitemap: https://snipshare.vaibhavmakvana.in/sitemap.xml
