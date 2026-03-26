@@ -34,14 +34,32 @@ const sendEmail = async ({ to, subject, text, html }) => {
         throw new Error('Email service is not configured. Required: SMTP_USER/EMAIL_USER, SMTP_PASS/EMAIL_PASS/GMAIL_APP_PASSWORD, and SMTP_FROM/EMAIL_FROM.');
     }
 
-    try {
-        await transporter.sendMail({
-            from: getFromAddress(),
-            to,
-            subject,
-            text,
-            html,
+    const sendTimeout = Number(process.env.SMTP_SEND_TIMEOUT || 15000);
+    const withTimeout = (promise, ms) =>
+        new Promise((resolve, reject) => {
+            const timer = setTimeout(() => reject(new Error(`Email delivery timed out after ${ms}ms`)), ms);
+            promise
+                .then((result) => {
+                    clearTimeout(timer);
+                    resolve(result);
+                })
+                .catch((error) => {
+                    clearTimeout(timer);
+                    reject(error);
+                });
         });
+
+    try {
+        await withTimeout(
+            transporter.sendMail({
+                from: getFromAddress(),
+                to,
+                subject,
+                text,
+                html,
+            }),
+            sendTimeout
+        );
     } catch (err) {
         const reason = err?.message || 'Unknown SMTP error';
         throw new Error(`Email delivery failed: ${reason}`);

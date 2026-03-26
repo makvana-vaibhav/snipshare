@@ -71,7 +71,7 @@ router.post('/signup', validateSignup, async (req, res, next) => {
             });
         } catch (emailErr) {
             return res.status(202).json({
-                message: 'Account created, but verification email could not be sent. Please use resend verification after fixing SMTP credentials.',
+                message: emailErr?.message || 'Account created, but verification email could not be sent. Please use resend verification after fixing SMTP credentials.',
                 code: 'VERIFICATION_EMAIL_SEND_FAILED',
             });
         }
@@ -155,7 +155,7 @@ router.post('/resend-verification', async (req, res, next) => {
             });
         } catch (emailErr) {
             return res.status(502).json({
-                message: 'Unable to send verification email. Check SMTP_USER/SMTP_PASS (Gmail app password) and try again.',
+                message: emailErr?.message || 'Unable to send verification email. Check SMTP_USER/SMTP_PASS (Gmail app password) and try again.',
                 code: 'VERIFICATION_EMAIL_SEND_FAILED',
             });
         }

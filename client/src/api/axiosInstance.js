@@ -2,9 +2,10 @@ import axios from 'axios';
 
 const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 const fallbackBaseUrl = isLocal ? 'http://localhost:5000/api' : 'https://api-snipshare.vaibhavmakvana.in/api';
+const requestTimeout = Number(import.meta.env.VITE_API_TIMEOUT || 15000);
 
 const api = axios.create({
-    timeout: Number(import.meta.env.VITE_API_TIMEOUT || 15000),
+    timeout: requestTimeout,
 });
 
 api.interceptors.request.use((config) => {
@@ -24,14 +25,25 @@ api.interceptors.response.use(
     (response) => response,
     async (error) => {
         const originalRequest = error.config;
+        const requestUrl = originalRequest?.url || '';
+        const skipRefreshForAuthRoutes =
+            requestUrl.includes('/auth/login') ||
+            requestUrl.includes('/auth/signup') ||
+            requestUrl.includes('/auth/resend-verification') ||
+            requestUrl.includes('/auth/refresh') ||
+            requestUrl.includes('/auth/verify-email');
 
-        if (error.response?.status === 401 && !originalRequest._retry) {
+        if (error.response?.status === 401 && originalRequest && !originalRequest._retry && !skipRefreshForAuthRoutes) {
             originalRequest._retry = true;
             const refreshToken = localStorage.getItem('snipshare_refresh_token');
 
             if (refreshToken) {
                 try {
-                    const res = await axios.post(`${fallbackBaseUrl}/auth/refresh`, { refreshToken });
+                    const res = await axios.post(
+                        `${fallbackBaseUrl}/auth/refresh`,
+                        { refreshToken },
+                        { timeout: requestTimeout }
+                    );
                     const newAccessToken = res.data.accessToken;
                     localStorage.setItem('snipshare_token', newAccessToken);
                     originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
