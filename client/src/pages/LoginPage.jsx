@@ -10,7 +10,7 @@ export default function LoginPage() {
     useSEO('Login - Manage SnipShare Account', 'Log in to your SnipShare dashboard to track snippet views, manage expiration times, and review your online code sharing history.');
     const { login } = useAuth();
     const navigate = useNavigate();
-    const [form, setForm] = useState({ email: '', password: '', rememberMe: false });
+    const [form, setForm] = useState({ username: '', password: '', rememberMe: false });
     const [loading, setLoading] = useState(false);
 
     const handleChange = (e) => {
@@ -46,11 +46,11 @@ export default function LoginPage() {
                     </div>
                     <form onSubmit={handleSubmit}>
                         <div className="form-group">
-                            <label htmlFor="email">Email</label>
+                            <label htmlFor="username">Username</label>
                             <input
-                                id="email" name="temail" type="email"
-                                placeholder="you@example.com"
-                                value={form.email} onChange={handleChange} required
+                                id="username" name="username" type="text"
+                                placeholder="coolcoder"
+                                value={form.username} onChange={handleChange} required
                             />
                         </div>
                         <div className="form-group">

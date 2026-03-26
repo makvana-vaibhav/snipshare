@@ -22,13 +22,27 @@ router.post('/signup', validateSignup, async (req, res, next) => {
 
     try {
         const { username, email, password, rememberMe } = req.body;
-        const existing = await User.findOne({ $or: [{ email }, { username }] });
+        const normalizedUsername = username.trim();
+        const normalizedEmail = email ? String(email).toLowerCase().trim() : undefined;
+
+        const existing = await User.findOne(
+            normalizedEmail
+                ? { $or: [{ email: normalizedEmail }, { username: normalizedUsername }] }
+                : { username: normalizedUsername }
+        );
+
         if (existing) {
-            return res.status(409).json({
-                message: existing.email === email ? 'Email already in use' : 'Username already taken',
-            });
+            if (existing.username === normalizedUsername) {
+                return res.status(409).json({ message: 'Username already taken' });
+            }
+            return res.status(409).json({ message: 'Email already in use' });
         }
-        const user = await User.create({ username, email, password, rememberMe: rememberMe || false });
+        const user = await User.create({
+            username: normalizedUsername,
+            email: normalizedEmail,
+            password,
+            rememberMe: rememberMe || false,
+        });
         
         const accessToken = generateAccessToken(user._id);
         const refreshToken = generateRefreshToken(user._id);
@@ -57,10 +71,10 @@ router.post('/login', validateLogin, async (req, res, next) => {
     }
 
     try {
-        const { email, password, rememberMe } = req.body;
-        const user = await User.findOne({ email });
+        const { username, password, rememberMe } = req.body;
+        const user = await User.findOne({ username: username.trim() });
         if (!user || !(await user.matchPassword(password))) {
-            return res.status(401).json({ message: 'Invalid email or password' });
+            return res.status(401).json({ message: 'Invalid username or password' });
         }
 
         const accessToken = generateAccessToken(user._id);

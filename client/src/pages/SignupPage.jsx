@@ -10,7 +10,7 @@ export default function SignupPage() {
     useSEO('Sign Up - Secure Online Snippet Tool', 'Create a free SnipShare account to manage and edit your snippets securely. The perfect utility to share code online and track your notes.');
     const { login } = useAuth();
     const navigate = useNavigate();
-    const [form, setForm] = useState({ username: '', email: '', password: '', rememberMe: true });
+    const [form, setForm] = useState({ username: '', password: '', rememberMe: true });
     const [loading, setLoading] = useState(false);
 
     const handleChange = (e) => {
@@ -52,14 +52,6 @@ export default function SignupPage() {
                                 placeholder="coolcoder"
                                 value={form.username} onChange={handleChange}
                                 minLength={3} maxLength={30} required
-                            />
-                        </div>
-                        <div className="form-group">
-                            <label htmlFor="email">Email</label>
-                            <input
-                                id="email" name="email" type="email"
-                                placeholder="you@example.com"
-                                value={form.email} onChange={handleChange} required
                             />
                         </div>
                         <div className="form-group">

@@ -26,6 +26,7 @@ exports.validateSignup = [
         .isLength({ min: 3, max: 30 }).withMessage('Username must be 3-30 characters')
         .isAlphanumeric().withMessage('Username must be alphanumeric'),
     body('email')
+        .optional({ checkFalsy: true })
         .isEmail().withMessage('Valid email is required')
         .normalizeEmail(),
     body('password')
@@ -33,6 +34,10 @@ exports.validateSignup = [
 ];
 
 exports.validateLogin = [
-    body('email').isEmail().withMessage('Valid email is required').normalizeEmail(),
+    body('username')
+        .trim()
+        .notEmpty().withMessage('Username is required')
+        .isLength({ min: 3, max: 30 }).withMessage('Username must be 3-30 characters')
+        .isAlphanumeric().withMessage('Username must be alphanumeric'),
     body('password').notEmpty().withMessage('Password is required'),
 ];
