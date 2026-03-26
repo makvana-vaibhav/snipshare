@@ -62,8 +62,38 @@
     justify-content: center;
 }
 
+.new-snippet-btn {
+    color: #0a0a0a !important;
+}
+
+@media (max-width: 768px) {
+    .hide-mobile-login {
+        display: none;
+    }
+
+    .navbar-nav {
+        gap: 0.45rem;
+    }
+
+    .new-snippet-btn {
+        padding: 0.4rem 0.75rem;
+        font-size: 0.78rem;
+    }
+
+    .theme-btn {
+        min-width: 72px;
+        padding: 0.4rem 0.65rem;
+        font-size: 0.78rem;
+    }
+}
+
 @media (max-width: 480px) {
     .navbar-brand .brand-name {
         display: none;
+    }
+
+    .new-snippet-btn {
+        padding: 0.35rem 0.55rem;
+        font-size: 0.75rem;
     }
 }

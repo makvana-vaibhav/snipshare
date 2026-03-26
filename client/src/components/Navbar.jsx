@@ -38,7 +38,7 @@ export default function Navbar() {
                     <button onClick={toggleTheme} className="btn btn-ghost btn-sm theme-btn" title="Toggle theme">
                         {theme === 'dark' ? '☀ Light' : '🌙 Dark'}
                     </button>
-                    <NavLink to="/" end className="nav-link btn btn-primary btn-sm hide-sm" style={{ color: '#0A0A0A' }}>
+                    <NavLink to="/" end className="nav-link btn btn-primary btn-sm new-snippet-btn">
                         + New Snippet
                     </NavLink>
                     {user ? (
@@ -50,7 +50,7 @@ export default function Navbar() {
                         </>
                     ) : (
                         <>
-                            <NavLink to="/login" className="nav-link">Login</NavLink>
+                            <NavLink to="/login" className="nav-link hide-mobile-login">Login</NavLink>
                             <Link to="/signup" className="btn btn-secondary btn-sm">Sign Up</Link>
                         </>
                     )}

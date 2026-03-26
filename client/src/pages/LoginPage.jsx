@@ -48,7 +48,7 @@ export default function LoginPage() {
                         <div className="form-group">
                             <label htmlFor="email">Email</label>
                             <input
-                                id="email" name="email" type="email"
+                                id="email" name="temail" type="email"
                                 placeholder="you@example.com"
                                 value={form.email} onChange={handleChange} required
                             />
