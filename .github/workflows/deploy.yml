@@ -1,4 +1,4 @@
-name: Build and Deploy
+name: CI/CD Pipeline
 
 on:
   push:
@@ -6,8 +6,50 @@ on:
   workflow_dispatch:
 
 jobs:
-  deploy:
+
+  checkout:
+    name: Checkout Code
     runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+  build:
+    name: Build Docker Image
+    runs-on: ubuntu-latest
+    needs: checkout
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Build Docker image
+        run: docker build -t snipshare-app .
+
+  test:
+    name: Run Basic Test
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: Dummy test (can replace later)
+        run: echo "Tests passed"
+
+  push-image:
+    name: Push Image (Optional)
+    runs-on: ubuntu-latest
+    needs: test
+
+    steps:
+      - name: Skip push (placeholder)
+        run: echo "Skipping Docker Hub push"
+
+  deploy:
+    name: Deploy to EC2
+    runs-on: ubuntu-latest
+    needs: push-image
+
     steps:
       - name: Validate required secrets
         run: |
