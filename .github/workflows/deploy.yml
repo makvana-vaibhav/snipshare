@@ -21,6 +21,14 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Prepare CI env file for compose validation
+        run: |
+          if [ -f .env.deploy.example ]; then
+            cp .env.deploy.example .env.deploy
+          else
+            touch .env.deploy
+          fi
+
       - name: Validate deploy compose file
         run: docker compose -f docker-compose.deploy.yml config
 
