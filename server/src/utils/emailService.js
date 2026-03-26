@@ -13,18 +13,30 @@ const createTransporter = ({ host, port }) => {
 
     const smtpHost = host || process.env.SMTP_HOST || 'smtp.gmail.com';
     const smtpPort = Number(port || process.env.SMTP_PORT || 587);
+    const isGmail = smtpHost.includes('gmail');
+
+    const commonConfig = {
+        connectionTimeout: Number(process.env.SMTP_CONNECTION_TIMEOUT || 7000),
+        greetingTimeout: Number(process.env.SMTP_GREETING_TIMEOUT || 7000),
+        socketTimeout: Number(process.env.SMTP_SOCKET_TIMEOUT || 10000),
+        auth: {
+            user: getSmtpUser(),
+            pass: getSmtpPass(),
+        },
+    };
+
+    if (isGmail) {
+        return nodemailer.createTransport({
+            service: 'gmail',
+            ...commonConfig,
+        });
+    }
 
     return nodemailer.createTransport({
         host: smtpHost,
         port: smtpPort,
         secure: smtpPort === 465,
-        connectionTimeout: Number(process.env.SMTP_CONNECTION_TIMEOUT || 10000),
-        greetingTimeout: Number(process.env.SMTP_GREETING_TIMEOUT || 10000),
-        socketTimeout: Number(process.env.SMTP_SOCKET_TIMEOUT || 15000),
-        auth: {
-            user: getSmtpUser(),
-            pass: getSmtpPass(),
-        },
+        ...commonConfig,
     });
 };
 
@@ -36,7 +48,7 @@ const sendEmail = async ({ to, subject, text, html }) => {
         throw new Error('Email service is not configured. Required: SMTP_USER/EMAIL_USER, SMTP_PASS/EMAIL_PASS/GMAIL_APP_PASSWORD, and SMTP_FROM/EMAIL_FROM.');
     }
 
-    const sendTimeout = Number(process.env.SMTP_SEND_TIMEOUT || 15000);
+    const sendTimeout = Number(process.env.SMTP_SEND_TIMEOUT || 12000);
     const withTimeout = (promise, ms) =>
         new Promise((resolve, reject) => {
             const timer = setTimeout(() => reject(new Error(`Email delivery timed out after ${ms}ms`)), ms);
@@ -71,7 +83,7 @@ const sendEmail = async ({ to, subject, text, html }) => {
         if (canRetryOn465) {
             try {
                 const fallbackTransporter = createTransporter({ host: smtpHost, port: 465 });
-                await withTimeout(fallbackTransporter.sendMail(mailPayload), sendTimeout);
+                await withTimeout(fallbackTransporter.sendMail(mailPayload), Math.min(sendTimeout, 6000));
                 return;
             } catch (fallbackErr) {
                 const reason = fallbackErr?.message || err?.message || 'Unknown SMTP error';
