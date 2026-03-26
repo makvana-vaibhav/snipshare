@@ -2,11 +2,13 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import api from '../api/axiosInstance';
+import { useAuth } from '../context/AuthContext';
 import useSEO from '../hooks/useSEO';
 import './AuthPage.css';
 
 export default function SignupPage() {
     useSEO('Sign Up - Secure Online Snippet Tool', 'Create a free SnipShare account to manage and edit your snippets securely. The perfect utility to share code online and track your notes.');
+    const { login } = useAuth();
     const navigate = useNavigate();
     const [form, setForm] = useState({ username: '', email: '', password: '', rememberMe: true });
     const [loading, setLoading] = useState(false);
@@ -24,21 +26,11 @@ export default function SignupPage() {
         setLoading(true);
         try {
             const res = await api.post('/auth/signup', form);
-            toast.error(res.data?.message || 'Account created. Please verify your email before login.');
-            navigate('/login');
+            login(res.data, res.data.accessToken, res.data.refreshToken, form.rememberMe);
+            toast.success(`Account created! Welcome, ${res.data.username}!`);
+            navigate('/dashboard');
         } catch (err) {
-            const errorMessage = err.response?.data?.message || 'Signup failed';
-
-            if (err.code === 'ECONNABORTED' || err.message?.includes('timeout')) {
-                toast.error('Signup timed out. Please check your backend and SMTP settings.');
-                return;
-            }
-            if (!err.response) {
-                // This could be a CORS issue caused by 502/504
-                toast.error('Network error. This may be a server-side error blocked by CORS (e.g. SMTP failure).');
-                return;
-            }
-            toast.error(errorMessage);
+            toast.error(err.response?.data?.message || 'Signup failed');
         } finally {
             setLoading(false);
         }
@@ -52,14 +44,13 @@ export default function SignupPage() {
                         <h1>Create account</h1>
                         <p className="text-muted">Start saving and sharing your snippets</p>
                     </div>
-                    <form onSubmit={handleSubmit} autoComplete="on">
+                    <form onSubmit={handleSubmit}>
                         <div className="form-group">
                             <label htmlFor="username">Username</label>
                             <input
                                 id="username" name="username" type="text"
                                 placeholder="coolcoder"
                                 value={form.username} onChange={handleChange}
-                                autoComplete="username"
                                 minLength={3} maxLength={30} required
                             />
                         </div>
@@ -69,7 +60,6 @@ export default function SignupPage() {
                                 id="email" name="email" type="email"
                                 placeholder="you@example.com"
                                 value={form.email} onChange={handleChange} required
-                                autoComplete="email"
                             />
                         </div>
                         <div className="form-group">
@@ -78,7 +68,6 @@ export default function SignupPage() {
                                 id="password" name="password" type="password"
                                 placeholder="Min. 6 characters"
                                 value={form.password} onChange={handleChange}
-                                autoComplete="new-password"
                                 minLength={6} required
                             />
                         </div>
