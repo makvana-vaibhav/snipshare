@@ -121,7 +121,7 @@ router.get('/verify-email', async (req, res, next) => {
 });
 
 // POST /api/auth/resend-verification
-router.post('/resend-verification', async (req, res, next) => {
+router.post(['/resend-verification', '/resend-verification/'], async (req, res, next) => {
     try {
         const { email } = req.body;
         if (!email) {

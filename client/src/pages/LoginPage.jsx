@@ -56,7 +56,16 @@ export default function LoginPage() {
         }
         setSendingVerification(true);
         try {
-            const res = await api.post('/auth/resend-verification', { email: form.email });
+            let res;
+            try {
+                res = await api.post('/auth/resend-verification', { email: form.email });
+            } catch (firstErr) {
+                if (firstErr.response?.status === 404) {
+                    res = await api.post('/auth/resend-verification/', { email: form.email });
+                } else {
+                    throw firstErr;
+                }
+            }
             toast.success(res.data?.message || 'Verification email sent');
         } catch (err) {
             if (err.code === 'ECONNABORTED') {

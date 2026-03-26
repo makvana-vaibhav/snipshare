@@ -8,16 +8,16 @@ const canSendEmail = () => {
     return Boolean(getSmtpUser() && getSmtpPass() && getFromAddress());
 };
 
-const createTransporter = () => {
+const createTransporter = ({ host, port }) => {
     if (!canSendEmail()) return null;
 
-    const host = process.env.SMTP_HOST || 'smtp.gmail.com';
-    const port = Number(process.env.SMTP_PORT || 587);
+    const smtpHost = host || process.env.SMTP_HOST || 'smtp.gmail.com';
+    const smtpPort = Number(port || process.env.SMTP_PORT || 587);
 
     return nodemailer.createTransport({
-        host,
-        port,
-        secure: port === 465,
+        host: smtpHost,
+        port: smtpPort,
+        secure: smtpPort === 465,
         connectionTimeout: Number(process.env.SMTP_CONNECTION_TIMEOUT || 10000),
         greetingTimeout: Number(process.env.SMTP_GREETING_TIMEOUT || 10000),
         socketTimeout: Number(process.env.SMTP_SOCKET_TIMEOUT || 15000),
@@ -29,7 +29,9 @@ const createTransporter = () => {
 };
 
 const sendEmail = async ({ to, subject, text, html }) => {
-    const transporter = createTransporter();
+    const smtpHost = process.env.SMTP_HOST || 'smtp.gmail.com';
+    const primaryPort = Number(process.env.SMTP_PORT || 587);
+    const transporter = createTransporter({ host: smtpHost, port: primaryPort });
     if (!transporter) {
         throw new Error('Email service is not configured. Required: SMTP_USER/EMAIL_USER, SMTP_PASS/EMAIL_PASS/GMAIL_APP_PASSWORD, and SMTP_FROM/EMAIL_FROM.');
     }
@@ -49,18 +51,34 @@ const sendEmail = async ({ to, subject, text, html }) => {
                 });
         });
 
+    const mailPayload = {
+        from: getFromAddress(),
+        to,
+        subject,
+        text,
+        html,
+    };
+
     try {
         await withTimeout(
-            transporter.sendMail({
-                from: getFromAddress(),
-                to,
-                subject,
-                text,
-                html,
-            }),
+            transporter.sendMail(mailPayload),
             sendTimeout
         );
     } catch (err) {
+        const isGmailHost = smtpHost.includes('gmail');
+        const canRetryOn465 = isGmailHost && primaryPort !== 465;
+
+        if (canRetryOn465) {
+            try {
+                const fallbackTransporter = createTransporter({ host: smtpHost, port: 465 });
+                await withTimeout(fallbackTransporter.sendMail(mailPayload), sendTimeout);
+                return;
+            } catch (fallbackErr) {
+                const reason = fallbackErr?.message || err?.message || 'Unknown SMTP error';
+                throw new Error(`Email delivery failed: ${reason}`);
+            }
+        }
+
         const reason = err?.message || 'Unknown SMTP error';
         throw new Error(`Email delivery failed: ${reason}`);
     }
