@@ -130,6 +130,79 @@ To remove volumes too:
 docker compose down -v
 ```
 
+## EC2 Deployment (MongoDB Atlas + GitHub Actions)
+
+Use this path when MongoDB stays on Atlas and only frontend/backend run on EC2.
+
+### 1) Prepare EC2 instance
+
+- Launch Ubuntu EC2
+- Open inbound ports: `22`, `80`, `443`
+- Install Docker + Compose plugin
+
+```bash
+sudo apt update
+sudo apt install -y ca-certificates curl gnupg
+sudo install -m 0755 -d /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+echo \
+    "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+    $(. /etc/os-release && echo $VERSION_CODENAME) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sudo apt update
+sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin git
+sudo usermod -aG docker $USER
+```
+
+Log out and log in again once.
+
+### 2) Clone repo on EC2
+
+```bash
+git clone https://github.com/makvana-vaibhav/snipshare.git
+cd snipshare
+cp .env.ec2.example .env.ec2
+```
+
+Edit `.env.ec2` with real values (`MONGO_URI`, JWT secrets, domains).
+
+### 3) Start once manually (sanity check)
+
+```bash
+docker compose -f docker-compose.ec2.yml --env-file .env.ec2 up -d
+docker compose -f docker-compose.ec2.yml --env-file .env.ec2 ps
+```
+
+### 4) Configure domain
+
+- Point your domain A record to EC2 public IP.
+- If you want HTTPS, put Nginx/Caddy/ALB in front and terminate TLS.
+
+### 5) Configure GitHub Actions secrets
+
+In GitHub repo settings, add:
+
+- `EC2_HOST` (public IP or DNS)
+- `EC2_USER` (e.g. `ubuntu`)
+- `EC2_SSH_KEY` (private key)
+- `EC2_APP_DIR` (e.g. `/home/ubuntu/snipshare`)
+- `GHCR_USERNAME` (your GitHub username)
+- `GHCR_PAT` (PAT with `read:packages`)
+
+### 6) CI/CD behavior
+
+Workflow file: `.github/workflows/deploy-ec2.yml`
+
+- On every push to `main`:
+    1. Build client/server Docker images
+    2. Push images to GHCR
+    3. SSH into EC2
+    4. Pull latest images
+    5. Recreate containers with `docker compose`
+
+### 7) Atlas note
+
+No Mongo container is used on EC2 flow. API connects directly to Atlas via `MONGO_URI` from `.env.ec2`.
+
 ---
 *Built by Vaibhav Makvana*
 

@@ -1,0 +1,50 @@
+services:
+  api-server:
+    image: ghcr.io/makvana-vaibhav/snipshare-server:${IMAGE_TAG:-latest}
+    container_name: snipshare-server
+    restart: always
+    environment:
+      PORT: 5005
+      NODE_ENV: production
+      MONGO_URI: ${MONGO_URI}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
+      FRONTEND_URL: ${FRONTEND_URL}
+      API_PUBLIC_URL: ${API_PUBLIC_URL}
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+      SMTP_FROM: ${SMTP_FROM:-}
+    expose:
+      - "5005"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:5005/api/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 8
+      start_period: 20s
+    networks:
+      - snipshare-net
+
+  client:
+    image: ghcr.io/makvana-vaibhav/snipshare-client:${IMAGE_TAG:-latest}
+    container_name: snipshare-client
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      api-server:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost/"]
+      interval: 15s
+      timeout: 5s
+      retries: 8
+      start_period: 10s
+    networks:
+      - snipshare-net
+
+networks:
+  snipshare-net:
+    name: snipshare-net
