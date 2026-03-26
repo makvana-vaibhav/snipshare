@@ -20,7 +20,7 @@ const generateRefreshToken = (id) =>
     jwt.sign({ id }, process.env.JWT_REFRESH_SECRET || process.env.JWT_SECRET, { expiresIn: '7d' });
 
 const buildVerificationUrl = (req, token) => {
-    const baseUrl = process.env.API_PUBLIC_URL || `${req.protocol}://${req.get('host')}`;
+    const baseUrl = process.env.API_PUBLIC_URL || process.env.APP_BASE_URL || `${req.protocol}://${req.get('host')}`;
     return `${baseUrl}/api/auth/verify-email?token=${token}`;
 };
 
