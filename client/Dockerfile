@@ -2,11 +2,13 @@ FROM node:20-alpine AS build
 
 WORKDIR /app
 COPY package*.json ./
-RUN npm install
+RUN npm ci
 
 COPY . .
-# Use a relative API URL for the production build so Nginx can proxy it
-ENV VITE_API_URL=/api
+
+ARG VITE_API_BASE_URL=/api
+ENV VITE_API_BASE_URL=${VITE_API_BASE_URL}
+
 RUN npm run build
 
 FROM nginx:alpine

@@ -1,14 +1,20 @@
-version: '3.8'
-
 services:
   mongodb:
-    image: mongo:6-jammy
+    image: mongo:7
     container_name: snipshare-mongodb
     restart: unless-stopped
     ports:
       - "27017:27017"
     volumes:
       - mongodb_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    networks:
+      - snipshare-net
 
   api-server:
     build:
@@ -16,26 +22,58 @@ services:
       dockerfile: Dockerfile
     container_name: snipshare-server
     restart: unless-stopped
+    environment:
+      PORT: 5005
+      NODE_ENV: production
+      MONGO_URI: mongodb://mongodb:27017/snipshare
+      JWT_SECRET: ${JWT_SECRET:-change_me_in_production}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-change_me_refresh_in_production}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:8080}
+      API_PUBLIC_URL: ${API_PUBLIC_URL:-http://localhost:5005}
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+      SMTP_FROM: ${SMTP_FROM:-}
     ports:
       - "5005:5005"
-    environment:
-      - PORT=5005
-      - MONGO_URI=mongodb://mongodb:27017/snipshare
-      - JWT_SECRET=change_me_in_production
-      - CLIENT_ORIGIN=http://localhost:8080
     depends_on:
-      - mongodb
+      mongodb:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:5005/api/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 8
+      start_period: 20s
+    networks:
+      - snipshare-net
 
   client:
     build:
       context: ./client
       dockerfile: Dockerfile
+      args:
+        VITE_API_BASE_URL: /api
     container_name: snipshare-client
     restart: unless-stopped
     ports:
       - "8080:80"
     depends_on:
-      - api-server
+      api-server:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost/"]
+      interval: 15s
+      timeout: 5s
+      retries: 8
+      start_period: 10s
+    networks:
+      - snipshare-net
 
 volumes:
   mongodb_data:
+
+networks:
+  snipshare-net:
+    name: snipshare-net

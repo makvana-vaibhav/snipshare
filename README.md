@@ -80,6 +80,56 @@ Deploy the `server` directory as a Node Web Service on Render. Make sure the `St
 **Frontend (Netlify):**
 Point Netlify to the `client` directory. Netlify inherently understands the Vite build step, uses `client/public/_redirects` for React Router DOM integration, and discovers the remote Production backend dynamically.
 
+## Docker / DevOps Setup
+
+This repository now includes production-style containerization for the full stack:
+
+- `mongodb` service (persistent volume + healthcheck)
+- `api-server` service (Node.js API + healthcheck)
+- `client` service (Nginx serving Vite build + reverse proxy to API)
+
+### 1. Configure environment variables
+
+Create a root `.env` file (used by Docker Compose interpolation):
+
+```env
+JWT_SECRET=replace_with_secure_secret
+JWT_REFRESH_SECRET=replace_with_secure_refresh_secret
+FRONTEND_URL=http://localhost:8080
+API_PUBLIC_URL=http://localhost:5005
+
+# Optional SMTP
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=
+SMTP_PASS=
+SMTP_FROM=
+```
+
+### 2. Build and run
+
+```bash
+docker compose up -d --build
+```
+
+### 3. Access services
+
+- Frontend: `http://localhost:8080`
+- API health: `http://localhost:5005/api/health`
+- MongoDB: `mongodb://localhost:27017/snipshare`
+
+### 4. Stop services
+
+```bash
+docker compose down
+```
+
+To remove volumes too:
+
+```bash
+docker compose down -v
+```
+
 ---
 *Built by Vaibhav Makvana*
 

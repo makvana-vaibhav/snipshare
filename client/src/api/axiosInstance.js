@@ -1,7 +1,8 @@
 import axios from 'axios';
 
 const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-const fallbackBaseUrl = isLocal ? 'http://localhost:5000/api' : 'https://api-snipshare.vaibhavmakvana.in/api';
+const envBaseUrl = import.meta.env.VITE_API_BASE_URL;
+const fallbackBaseUrl = envBaseUrl || (isLocal ? 'http://localhost:5005/api' : 'https://api-snipshare.vaibhavmakvana.in/api');
 
 const api = axios.create();
 
