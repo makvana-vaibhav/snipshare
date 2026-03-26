@@ -27,6 +27,14 @@ export default function SignupPage() {
             toast.success(res.data?.message || 'Account created. Please verify your email before login.');
             navigate('/login');
         } catch (err) {
+            if (err.code === 'ECONNABORTED') {
+                toast.error('Request timed out. Please check your backend and SMTP settings.');
+                return;
+            }
+            if (!err.response) {
+                toast.error('Network error. Could not reach server.');
+                return;
+            }
             toast.error(err.response?.data?.message || 'Signup failed');
         } finally {
             setLoading(false);

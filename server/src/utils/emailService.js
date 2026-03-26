@@ -18,6 +18,9 @@ const createTransporter = () => {
         host,
         port,
         secure: port === 465,
+        connectionTimeout: Number(process.env.SMTP_CONNECTION_TIMEOUT || 10000),
+        greetingTimeout: Number(process.env.SMTP_GREETING_TIMEOUT || 10000),
+        socketTimeout: Number(process.env.SMTP_SOCKET_TIMEOUT || 15000),
         auth: {
             user: getSmtpUser(),
             pass: getSmtpPass(),
@@ -31,13 +34,18 @@ const sendEmail = async ({ to, subject, text, html }) => {
         throw new Error('Email service is not configured. Required: SMTP_USER/EMAIL_USER, SMTP_PASS/EMAIL_PASS/GMAIL_APP_PASSWORD, and SMTP_FROM/EMAIL_FROM.');
     }
 
-    await transporter.sendMail({
-        from: getFromAddress(),
-        to,
-        subject,
-        text,
-        html,
-    });
+    try {
+        await transporter.sendMail({
+            from: getFromAddress(),
+            to,
+            subject,
+            text,
+            html,
+        });
+    } catch (err) {
+        const reason = err?.message || 'Unknown SMTP error';
+        throw new Error(`Email delivery failed: ${reason}`);
+    }
 };
 
 const sendVerificationEmail = async ({ to, username, verificationUrl }) => {

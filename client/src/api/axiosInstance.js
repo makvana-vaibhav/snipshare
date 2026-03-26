@@ -3,7 +3,9 @@ import axios from 'axios';
 const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 const fallbackBaseUrl = isLocal ? 'http://localhost:5000/api' : 'https://api-snipshare.vaibhavmakvana.in/api';
 
-const api = axios.create();
+const api = axios.create({
+    timeout: Number(import.meta.env.VITE_API_TIMEOUT || 15000),
+});
 
 api.interceptors.request.use((config) => {
     // Manually stitch the URL to bypass Axios dropping the /api prefix

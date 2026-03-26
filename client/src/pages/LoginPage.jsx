@@ -31,6 +31,14 @@ export default function LoginPage() {
             toast.success(`Welcome back, ${res.data.username}!`);
             navigate('/dashboard');
         } catch (err) {
+            if (err.code === 'ECONNABORTED') {
+                toast.error('Request timed out. Please try again.');
+                return;
+            }
+            if (!err.response) {
+                toast.error('Network error. Could not reach server.');
+                return;
+            }
             if (err.response?.data?.code === 'EMAIL_NOT_VERIFIED') {
                 toast.error('Please verify your email first.');
                 return;
@@ -51,6 +59,14 @@ export default function LoginPage() {
             const res = await api.post('/auth/resend-verification', { email: form.email });
             toast.success(res.data?.message || 'Verification email sent');
         } catch (err) {
+            if (err.code === 'ECONNABORTED') {
+                toast.error('Request timed out. Please check your backend and SMTP settings.');
+                return;
+            }
+            if (!err.response) {
+                toast.error('Network error. Could not reach server.');
+                return;
+            }
             toast.error(err.response?.data?.message || 'Failed to send verification email');
         } finally {
             setSendingVerification(false);
