@@ -130,13 +130,13 @@ To remove volumes too:
 docker compose down -v
 ```
 
-## EC2 Deployment (MongoDB Atlas + GitHub Actions)
+## AWS Deployment (MongoDB Atlas + GitHub Actions)
 
-Use this path when MongoDB stays on Atlas and only frontend/backend run on EC2.
+Use this path when MongoDB stays on Atlas and only frontend/backend run on AWS server.
 
-### 1) Prepare EC2 instance
+### 1) Prepare AWS server instance
 
-- Launch Ubuntu EC2
+- Launch Ubuntu server instance
 - Open inbound ports: `22`, `80`, `443`
 - Install Docker + Compose plugin
 
@@ -155,53 +155,53 @@ sudo usermod -aG docker $USER
 
 Log out and log in again once.
 
-### 2) Clone repo on EC2
+### 2) Clone repo on server
 
 ```bash
 git clone https://github.com/makvana-vaibhav/snipshare.git
 cd snipshare
-cp .env.ec2.example .env.ec2
+cp .env.deploy.example .env.deploy
 ```
 
-Edit `.env.ec2` with real values (`MONGO_URI`, JWT secrets, domains).
+Edit `.env.deploy` with real values (`MONGO_URI`, JWT secrets, domains).
 
 ### 3) Start once manually (sanity check)
 
 ```bash
-docker compose -f docker-compose.ec2.yml --env-file .env.ec2 up -d
-docker compose -f docker-compose.ec2.yml --env-file .env.ec2 ps
+docker compose -f docker-compose.deploy.yml --env-file .env.deploy up -d
+docker compose -f docker-compose.deploy.yml --env-file .env.deploy ps
 ```
 
 ### 4) Configure domain
 
-- Point your domain A record to EC2 public IP.
+- Point your domain A record to server public IP.
 - If you want HTTPS, put Nginx/Caddy/ALB in front and terminate TLS.
 
 ### 5) Configure GitHub Actions secrets
 
 In GitHub repo settings, add:
 
-- `EC2_HOST` (public IP or DNS)
-- `EC2_USER` (e.g. `ubuntu`)
-- `EC2_SSH_KEY` (private key)
-- `EC2_APP_DIR` (e.g. `/home/ubuntu/snipshare`)
+- `DEPLOY_HOST` (public IP or DNS)
+- `DEPLOY_USER` (e.g. `ubuntu`)
+- `DEPLOY_SSH_KEY` (private key)
+- `DEPLOY_APP_DIR` (e.g. `/home/ubuntu/snipshare`)
 - `GHCR_USERNAME` (your GitHub username)
 - `GHCR_PAT` (PAT with `read:packages`)
 
 ### 6) CI/CD behavior
 
-Workflow file: `.github/workflows/deploy-ec2.yml`
+Workflow file: `.github/workflows/deploy.yml`
 
 - On every push to `main`:
     1. Build client/server Docker images
     2. Push images to GHCR
-    3. SSH into EC2
+    3. SSH into server
     4. Pull latest images
     5. Recreate containers with `docker compose`
 
 ### 7) Atlas note
 
-No Mongo container is used on EC2 flow. API connects directly to Atlas via `MONGO_URI` from `.env.ec2`.
+No Mongo container is used in deploy flow. API connects directly to Atlas via `MONGO_URI` from `.env.deploy`.
 
 ---
 *Built by Vaibhav Makvana*
