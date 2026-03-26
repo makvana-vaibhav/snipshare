@@ -11,7 +11,7 @@ services:
       PORT: ${PORT:-5005}
       NODE_ENV: production
     ports:
-      - "5005:5005"
+      - "127.0.0.1:5005:5005"
     expose:
       - "5005"
     healthcheck:
@@ -32,7 +32,7 @@ services:
     container_name: snipshare-client
     restart: always
     ports:
-      - "80:80"
+      - "127.0.0.1:8080:80"
     depends_on:
       api-server:
         condition: service_healthy
