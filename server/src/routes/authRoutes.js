@@ -63,11 +63,18 @@ router.post('/signup', validateSignup, async (req, res, next) => {
         }
 
         const verificationUrl = buildVerificationUrl(req, rawToken);
-        await sendVerificationEmail({
-            to: user.email,
-            username: user.username,
-            verificationUrl,
-        });
+        try {
+            await sendVerificationEmail({
+                to: user.email,
+                username: user.username,
+                verificationUrl,
+            });
+        } catch (emailErr) {
+            return res.status(202).json({
+                message: 'Account created, but verification email could not be sent. Please use resend verification after fixing SMTP credentials.',
+                code: 'VERIFICATION_EMAIL_SEND_FAILED',
+            });
+        }
 
         await user.save();
 
@@ -140,11 +147,18 @@ router.post('/resend-verification', async (req, res, next) => {
         await user.save();
 
         const verificationUrl = buildVerificationUrl(req, rawToken);
-        await sendVerificationEmail({
-            to: user.email,
-            username: user.username,
-            verificationUrl,
-        });
+        try {
+            await sendVerificationEmail({
+                to: user.email,
+                username: user.username,
+                verificationUrl,
+            });
+        } catch (emailErr) {
+            return res.status(502).json({
+                message: 'Unable to send verification email. Check SMTP_USER/SMTP_PASS (Gmail app password) and try again.',
+                code: 'VERIFICATION_EMAIL_SEND_FAILED',
+            });
+        }
 
         return res.json({ message: 'Verification email sent' });
     } catch (err) {

@@ -1,9 +1,11 @@
 const nodemailer = require('nodemailer');
 
-const getFromAddress = () => process.env.SMTP_FROM || process.env.EMAIL_FROM || process.env.SMTP_USER;
+const getSmtpUser = () => process.env.SMTP_USER || process.env.EMAIL_USER;
+const getSmtpPass = () => process.env.SMTP_PASS || process.env.EMAIL_PASS || process.env.GMAIL_APP_PASSWORD;
+const getFromAddress = () => process.env.SMTP_FROM || process.env.EMAIL_FROM || process.env.SMTP_USER || process.env.EMAIL_USER;
 
 const canSendEmail = () => {
-    return Boolean(process.env.SMTP_USER && process.env.SMTP_PASS && getFromAddress());
+    return Boolean(getSmtpUser() && getSmtpPass() && getFromAddress());
 };
 
 const createTransporter = () => {
@@ -17,8 +19,8 @@ const createTransporter = () => {
         port,
         secure: port === 465,
         auth: {
-            user: process.env.SMTP_USER,
-            pass: process.env.SMTP_PASS,
+            user: getSmtpUser(),
+            pass: getSmtpPass(),
         },
     });
 };
@@ -26,7 +28,7 @@ const createTransporter = () => {
 const sendEmail = async ({ to, subject, text, html }) => {
     const transporter = createTransporter();
     if (!transporter) {
-        throw new Error('Email service is not configured. Required: SMTP_USER, SMTP_PASS, and SMTP_FROM (or EMAIL_FROM).');
+        throw new Error('Email service is not configured. Required: SMTP_USER/EMAIL_USER, SMTP_PASS/EMAIL_PASS/GMAIL_APP_PASSWORD, and SMTP_FROM/EMAIL_FROM.');
     }
 
     await transporter.sendMail({
