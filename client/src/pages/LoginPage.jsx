@@ -81,13 +81,14 @@ export default function LoginPage() {
                         <h1>Welcome back</h1>
                         <p className="text-muted">Sign in to manage your pastes</p>
                     </div>
-                    <form onSubmit={handleSubmit}>
+                    <form onSubmit={handleSubmit} autoComplete="on">
                         <div className="form-group">
                             <label htmlFor="email">Email</label>
                             <input
                                 id="email" name="email" type="email"
                                 placeholder="you@example.com"
                                 value={form.email} onChange={handleChange} required
+                                autoComplete="email"
                             />
                         </div>
                         <div className="form-group">
@@ -96,6 +97,7 @@ export default function LoginPage() {
                                 id="password" name="password" type="password"
                                 placeholder="••••••••"
                                 value={form.password} onChange={handleChange} required
+                                autoComplete="current-password"
                             />
                         </div>
                         <div className="form-group">

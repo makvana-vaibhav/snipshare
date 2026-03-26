@@ -49,13 +49,14 @@ export default function SignupPage() {
                         <h1>Create account</h1>
                         <p className="text-muted">Start saving and sharing your snippets</p>
                     </div>
-                    <form onSubmit={handleSubmit}>
+                    <form onSubmit={handleSubmit} autoComplete="on">
                         <div className="form-group">
                             <label htmlFor="username">Username</label>
                             <input
                                 id="username" name="username" type="text"
                                 placeholder="coolcoder"
                                 value={form.username} onChange={handleChange}
+                                autoComplete="username"
                                 minLength={3} maxLength={30} required
                             />
                         </div>
@@ -65,6 +66,7 @@ export default function SignupPage() {
                                 id="email" name="email" type="email"
                                 placeholder="you@example.com"
                                 value={form.email} onChange={handleChange} required
+                                autoComplete="email"
                             />
                         </div>
                         <div className="form-group">
@@ -73,6 +75,7 @@ export default function SignupPage() {
                                 id="password" name="password" type="password"
                                 placeholder="Min. 6 characters"
                                 value={form.password} onChange={handleChange}
+                                autoComplete="new-password"
                                 minLength={6} required
                             />
                         </div>
