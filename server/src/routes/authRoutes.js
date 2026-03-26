@@ -154,7 +154,7 @@ router.post(['/resend-verification', '/resend-verification/'], async (req, res, 
                 verificationUrl,
             });
         } catch (emailErr) {
-            return res.status(502).json({
+            return res.status(500).json({
                 message: emailErr?.message || 'Unable to send verification email. Check SMTP_USER/SMTP_PASS (Gmail app password) and try again.',
                 code: 'VERIFICATION_EMAIL_SEND_FAILED',
             });
@@ -189,7 +189,7 @@ router.post('/login', validateLogin, async (req, res, next) => {
 
         const accessToken = generateAccessToken(user._id);
         const refreshToken = generateRefreshToken(user._id);
-        
+
         user.refreshToken = refreshToken;
         user.rememberMe = rememberMe || false;
         user.lastLoginAt = new Date();
@@ -202,7 +202,7 @@ router.post('/login', validateLogin, async (req, res, next) => {
                 ip: req.ip,
                 userAgent: req.headers['user-agent'] || 'Unknown device',
                 dateTime: new Date().toLocaleString(),
-            }).catch(() => {});
+            }).catch(() => { });
         }
 
         res.json({

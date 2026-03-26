@@ -24,18 +24,21 @@ export default function SignupPage() {
         setLoading(true);
         try {
             const res = await api.post('/auth/signup', form);
-            toast.success(res.data?.message || 'Account created. Please verify your email before login.');
+            toast.error(res.data?.message || 'Account created. Please verify your email before login.');
             navigate('/login');
         } catch (err) {
-            if (err.code === 'ECONNABORTED') {
-                toast.error('Request timed out. Please check your backend and SMTP settings.');
+            const errorMessage = err.response?.data?.message || 'Signup failed';
+
+            if (err.code === 'ECONNABORTED' || err.message?.includes('timeout')) {
+                toast.error('Signup timed out. Please check your backend and SMTP settings.');
                 return;
             }
             if (!err.response) {
-                toast.error('Network error. Could not reach server.');
+                // This could be a CORS issue caused by 502/504
+                toast.error('Network error. This may be a server-side error blocked by CORS (e.g. SMTP failure).');
                 return;
             }
-            toast.error(err.response?.data?.message || 'Signup failed');
+            toast.error(errorMessage);
         } finally {
             setLoading(false);
         }

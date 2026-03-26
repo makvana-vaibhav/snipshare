@@ -68,15 +68,18 @@ export default function LoginPage() {
             }
             toast.success(res.data?.message || 'Verification email sent');
         } catch (err) {
-            if (err.code === 'ECONNABORTED') {
+            const errorMessage = err.response?.data?.message || 'Failed to send verification email';
+
+            if (err.code === 'ECONNABORTED' || err.message?.includes('timeout')) {
                 toast.error('Request timed out. Please check your backend and SMTP settings.');
                 return;
             }
             if (!err.response) {
-                toast.error('Network error. Could not reach server.');
+                // This could be a CORS issue caused by 502/504
+                toast.error('Network error. This may be a server-side error blocked by CORS (e.g. SMTP failure).');
                 return;
             }
-            toast.error(err.response?.data?.message || 'Failed to send verification email');
+            toast.error(errorMessage);
         } finally {
             setSendingVerification(false);
         }
