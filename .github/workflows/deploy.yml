@@ -41,7 +41,7 @@ jobs:
         run: echo "Tests passed"
 
   push-image:
-    name: Push Image (Optional Placeholder)
+    name: Build & Prepare Image
     runs-on: ubuntu-latest
     needs: test
     steps:
