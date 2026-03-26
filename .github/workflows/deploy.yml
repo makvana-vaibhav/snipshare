@@ -9,15 +9,23 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
+      - name: Validate required secrets
+        run: |
+          [ -n "${{ secrets.EC2_HOST }}" ] || (echo "EC2_HOST missing" && exit 1)
+          [ -n "${{ secrets.EC2_USER }}" ] || (echo "EC2_USER missing" && exit 1)
+          [ -n "${{ secrets.EC2_SSH_KEY }}" ] || (echo "EC2_SSH_KEY missing" && exit 1)
+          [ -n "${{ secrets.APP_DIR }}" ] || (echo "APP_DIR missing" && exit 1)
+
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
-          host: ${{ secrets.DEPLOY_HOST }}
-          username: ${{ secrets.DEPLOY_USER }}
-          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          port: ${{ secrets.EC2_PORT }}
+          key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             set -e
-            cd ${{ secrets.DEPLOY_APP_DIR }}
+            cd ${{ secrets.APP_DIR }}
             git fetch origin main
             git reset --hard origin/main
 
