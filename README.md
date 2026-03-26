@@ -168,7 +168,7 @@ Edit `.env.deploy` with real values (`MONGO_URI`, JWT secrets, domains).
 ### 3) Start once manually (sanity check)
 
 ```bash
-docker compose -f docker-compose.deploy.yml --env-file .env.deploy up -d
+docker compose -f docker-compose.deploy.yml --env-file .env.deploy up -d --build
 docker compose -f docker-compose.deploy.yml --env-file .env.deploy ps
 ```
 
@@ -185,19 +185,16 @@ In GitHub repo settings, add:
 - `DEPLOY_USER` (e.g. `ubuntu`)
 - `DEPLOY_SSH_KEY` (private key)
 - `DEPLOY_APP_DIR` (e.g. `/home/ubuntu/snipshare`)
-- `GHCR_USERNAME` (your GitHub username)
-- `GHCR_PAT` (PAT with `read:packages`)
 
 ### 6) CI/CD behavior
 
 Workflow file: `.github/workflows/deploy.yml`
 
 - On every push to `main`:
-    1. Build client/server Docker images
-    2. Push images to GHCR
-    3. SSH into server
-    4. Pull latest images
-    5. Recreate containers with `docker compose`
+    1. SSH into server
+    2. Pull latest code from `main`
+    3. Rebuild client/server images on server
+    4. Recreate containers with `docker compose`
 
 ### 7) Atlas note
 

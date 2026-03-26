@@ -1,21 +1,17 @@
 services:
   api-server:
-    image: ghcr.io/makvana-vaibhav/snipshare-server:${IMAGE_TAG:-latest}
+    build:
+      context: ./server
+      dockerfile: Dockerfile
     container_name: snipshare-server
     restart: always
+    env_file:
+      - .env.deploy
     environment:
-      PORT: 5005
+      PORT: ${PORT:-5005}
       NODE_ENV: production
-      MONGO_URI: ${MONGO_URI}
-      JWT_SECRET: ${JWT_SECRET}
-      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
-      FRONTEND_URL: ${FRONTEND_URL}
-      API_PUBLIC_URL: ${API_PUBLIC_URL}
-      SMTP_HOST: ${SMTP_HOST:-}
-      SMTP_PORT: ${SMTP_PORT:-}
-      SMTP_USER: ${SMTP_USER:-}
-      SMTP_PASS: ${SMTP_PASS:-}
-      SMTP_FROM: ${SMTP_FROM:-}
+    ports:
+      - "5005:5005"
     expose:
       - "5005"
     healthcheck:
@@ -28,7 +24,11 @@ services:
       - snipshare-net
 
   client:
-    image: ghcr.io/makvana-vaibhav/snipshare-client:${IMAGE_TAG:-latest}
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        VITE_API_BASE_URL: /api
     container_name: snipshare-client
     restart: always
     ports:
