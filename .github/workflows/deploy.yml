@@ -6,50 +6,44 @@ on:
   workflow_dispatch:
 
 jobs:
-
   checkout:
     name: Checkout Code
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
   build:
-    name: Build Docker Image
+    name: Validate Docker Compose
     runs-on: ubuntu-latest
     needs: checkout
-
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: Build Docker image
-        run: docker build -t snipshare-app .
+      - name: Validate deploy compose file
+        run: docker compose -f docker-compose.deploy.yml config
 
   test:
     name: Run Basic Test
     runs-on: ubuntu-latest
     needs: build
-
     steps:
-      - name: Dummy test (can replace later)
+      - name: Dummy test (replace with real tests later)
         run: echo "Tests passed"
 
   push-image:
-    name: Push Image (Optional)
+    name: Push Image (Optional Placeholder)
     runs-on: ubuntu-latest
     needs: test
-
     steps:
-      - name: Skip push (placeholder)
-        run: echo "Skipping Docker Hub push"
+      - name: Skip push step
+        run: echo "Skipping image push (build happens on EC2)"
 
   deploy:
     name: Deploy to EC2
     runs-on: ubuntu-latest
     needs: push-image
-
     steps:
       - name: Validate required secrets
         run: |
